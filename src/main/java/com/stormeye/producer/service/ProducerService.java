@@ -24,7 +24,7 @@ public class ProducerService {
         this.properties = properties;
     }
 
-    public void startEventConsumers(){
+    public void startEventConsumers() {
         final KafkaSender<Integer, String> kafkaProducer = new KafkaProducer(properties).getSender();
 
         properties.getEmitters().forEach(

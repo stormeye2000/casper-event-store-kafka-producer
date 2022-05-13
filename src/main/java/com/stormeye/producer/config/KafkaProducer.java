@@ -3,6 +3,8 @@ package com.stormeye.producer.config;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +14,12 @@ import reactor.kafka.sender.SenderOptions;
 /**
  * Kafka Producer start up configuration
  */
+@Configuration
 public class KafkaProducer {
 
     private final KafkaSender<Integer, String> sender;
 
-    public KafkaProducer(final ServiceProperties properties) {
+    public KafkaProducer(@Qualifier("ServiceProperties") final ServiceProperties properties) {
 
         final Map<String, Object> producerProps = new HashMap<>();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getKafka().getServer() + ":" + properties.getKafka().getPort());

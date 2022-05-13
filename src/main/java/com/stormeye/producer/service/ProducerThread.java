@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.List;
@@ -74,7 +73,7 @@ class ProducerThread extends Thread{
                     }
             );
 
-        } catch (IOException | InterruptedException | URISyntaxException e) {
+        } catch (IOException | InterruptedException e) {
             log.error(e.getMessage());
         }
 
