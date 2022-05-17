@@ -20,10 +20,12 @@ public class ProducerService {
 
     private final ServiceProperties properties;
     private final HttpService httpService;
+    private final TopicsService topicsService;
 
-    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final HttpService httpService) {
+    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final HttpService httpService, final TopicsService topicsService) {
         this.properties = properties;
         this.httpService = httpService;
+        this.topicsService = topicsService;
     }
 
     public void startEventConsumers() {
@@ -32,7 +34,7 @@ public class ProducerService {
         properties.getEmitters().forEach(
                 emitter -> {
                     log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
-                    new ProducerThread(httpService, properties.getKafka().getTopics(), kafkaProducer, emitter).start();
+                    new ProducerThread(httpService, topicsService, kafkaProducer, emitter).start();
                 }
         );
 

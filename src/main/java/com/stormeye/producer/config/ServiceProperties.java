@@ -72,6 +72,7 @@ public class ServiceProperties {
         public void setTopics(final List<String> topics) {
             this.topics = topics;
         }
+
     }
 
 
