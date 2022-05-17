@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.http.HttpResponse;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import reactor.core.publisher.Flux;
@@ -25,11 +25,13 @@ class ProducerThread extends Thread{
     private final HttpService httpService;
     private final List<String> topics;
     private final KafkaSender<Integer, String> sender;
+    private final URI emitterUri;
 
-    public ProducerThread(final HttpService httpService, final List<String> topics, final KafkaSender<Integer, String> sender){
+    public ProducerThread(final HttpService httpService, final List<String> topics, final KafkaSender<Integer, String> sender, final URI emitterUri){
         this.httpService = httpService;
         this.topics = topics;
         this.sender = sender;
+        this.emitterUri = emitterUri;
     }
 
     private boolean hasTopic(final String event) {
@@ -44,7 +46,7 @@ class ProducerThread extends Thread{
 
         try {
 
-            httpService.getClient().send(httpService.getRequest(), HttpResponse.BodyHandlers.ofLines()).body().forEach(
+            httpService.emitterStream(emitterUri).forEach(
 
                     event -> {
 

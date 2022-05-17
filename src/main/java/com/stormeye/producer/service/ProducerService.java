@@ -19,9 +19,11 @@ public class ProducerService {
     private static final Logger log = LoggerFactory.getLogger(ProducerService.class.getName());
 
     private final ServiceProperties properties;
+    private final HttpService httpService;
 
-    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties) {
+    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final HttpService httpService) {
         this.properties = properties;
+        this.httpService = httpService;
     }
 
     public void startEventConsumers() {
@@ -30,7 +32,7 @@ public class ProducerService {
         properties.getEmitters().forEach(
                 emitter -> {
                     log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
-                    new ProducerThread(new HttpService(emitter), properties.getKafka().getTopics(), kafkaProducer).start();
+                    new ProducerThread(httpService, properties.getKafka().getTopics(), kafkaProducer, emitter).start();
                 }
         );
 
