@@ -9,9 +9,12 @@ services:
     client: ${KAFKA_CLIENT_ID:stormeye-kafka}
     topics:
       - DeployProcessed
+      - DeployExpired
       - BlockAdded
       - DeployAccepted
       - FinalitySignature
+      - Step
+      - Fault
 logging:
   level:
     com:
