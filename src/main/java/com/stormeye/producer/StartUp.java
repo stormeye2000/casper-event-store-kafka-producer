@@ -9,7 +9,7 @@ import com.stormeye.producer.service.ProducerService;
  * Starts the application via the ProducerService
  */
 @Component
-public class StartUp implements ApplicationRunner {
+class StartUp implements ApplicationRunner {
 
     final ProducerService service;
 

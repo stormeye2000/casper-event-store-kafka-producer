@@ -35,7 +35,7 @@ public class ServiceProperties {
         this.kafka = kafka;
     }
 
-    public static class Kafka{
+    public final static class Kafka {
         private String server;
         private String port;
         private String client;

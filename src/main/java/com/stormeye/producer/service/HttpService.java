@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  * over HTTP
  */
 @Service
-public class HttpService {
+class HttpService {
 
     private HttpClient getClient(){
         return HttpClient.newHttpClient();
@@ -27,7 +27,5 @@ public class HttpService {
     public Stream<String> emitterStream(final URI emitter) throws IOException, InterruptedException {
         return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
     }
-
-
 
 }

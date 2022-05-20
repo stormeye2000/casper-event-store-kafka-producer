@@ -9,7 +9,7 @@ import com.stormeye.producer.config.ServiceProperties;
  * Maps to Casper Event Types
  */
 @Service
-public class TopicsService {
+class TopicsService {
 
     private final ServiceProperties serviceProperties;
 
