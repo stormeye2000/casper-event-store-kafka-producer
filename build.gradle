@@ -30,6 +30,9 @@ dependencies {
 
 	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.9.3'
 
+	implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+
+
 }
 
 

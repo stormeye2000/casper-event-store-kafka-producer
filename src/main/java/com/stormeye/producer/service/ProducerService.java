@@ -3,11 +3,11 @@ package com.stormeye.producer.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Service;
-import com.stormeye.producer.config.KafkaProducer;
 import com.stormeye.producer.config.ServiceProperties;
 
-import reactor.kafka.sender.KafkaSender;
+import reactor.kafka.sender.SenderOptions;
 
 /**
  * Service to start the kafka producer
@@ -29,13 +29,22 @@ public class ProducerService {
     }
 
     public void startEventConsumers() {
-        final KafkaSender<Integer, String> kafkaProducer = new KafkaProducer(properties).getSender();
+
+        final SenderOptions<Integer, String> options = SenderOptions.create(new KafkaProducerService(properties).getProperties());
+        final ReactiveKafkaProducerTemplate<Integer, String> template = new ReactiveKafkaProducerTemplate<>(options);
 
         properties.getEmitters().forEach(
                 emitter -> {
-                    log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
-                    new ProducerThread(httpService, topicsService, kafkaProducer, emitter).start();
+
+                    if (httpService.isValid(emitter)) {
+
+                        log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
+
+                        new ProducerThread(template, httpService, topicsService, emitter).start();
+
+                    }
                 }
+
         );
 
     }
