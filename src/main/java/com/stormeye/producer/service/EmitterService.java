@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.stream.Stream;
@@ -15,11 +14,12 @@ import java.util.stream.Stream;
 /**
  * Simple service to connect to a single event emitter
  * over HTTP
+ * connect method will retry n times
  */
 @Service
-class HttpService {
+class EmitterService {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(EmitterService.class.getName());
 
     private HttpClient getClient(){
         return HttpClient.newHttpClient();
@@ -33,23 +33,10 @@ class HttpService {
         return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
     }
 
-    public boolean isValid(final URI emitter) {
+    public void connect(final URI emitter) throws IOException, InterruptedException {
+       log.info("Attempting to connect to [{}]", emitter);
 
-        try {
-
-            final HttpHeaders headers = this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).headers();
-
-            return headers != null;
-
-        } catch (Exception e) {
-
-            log.error("Emitter [{}] connection error", emitter);
-            log.error(e.getMessage());
-
-            return false;
-        }
-
-
+       this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).headers();
     }
 
 }

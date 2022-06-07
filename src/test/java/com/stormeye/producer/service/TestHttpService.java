@@ -1,14 +1,17 @@
 package com.stormeye.producer.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.support.RetryTemplate;
+import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 
 import java.io.IOException;
@@ -16,18 +19,21 @@ import java.net.URI;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-@SpringBootTest(classes = {HttpService.class, TopicsService.class, ServiceProperties.class})
-@EnableConfigurationProperties(value = ServiceProperties.class)
+@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, AppConfig.class})
+@EnableConfigurationProperties(value = {ServiceProperties.class})
 @EnableAutoConfiguration
 public class TestHttpService {
 
     public static MockWebServer mockWebServer;
 
     @Autowired
-    private HttpService service;
+    private EmitterService service;
 
     @Autowired
     private TopicsService topics;
+
+    @Autowired
+    private RetryTemplate retryTemplate;
 
     private static String EVENT_STREAM;
 
@@ -49,6 +55,37 @@ public class TestHttpService {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
+
+    @Test
+    void TestInvalidConnection() {
+
+        Assertions.assertThrows(Exception.class, () -> {
+            retryTemplate.execute(ctx -> {
+                service.connect(URI.create("http://localhost:9999"));
+                return null;
+            });
+        });
+
+    }
+
+    @Test
+    void TestValidConnection() {
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(200));
+
+        RetryContext context = retryTemplate.execute(ctx -> {
+            try {
+                service.connect((URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ctx;
+        });
+
+        assertNull(context.getLastThrowable());
+    }
+
 
     @Test
     void TestSimpleHttp() throws IOException, InterruptedException {
@@ -76,7 +113,6 @@ public class TestHttpService {
                assertTrue(topics.hasTopic(event));
            }
         );
-
     }
 
 }

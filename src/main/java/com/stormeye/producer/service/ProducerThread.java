@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import com.stormeye.producer.domain.Event;
+import com.stormeye.producer.exceptions.EmitterStoppedException;
 
 import java.net.URI;
 import java.util.Date;
@@ -20,14 +21,14 @@ class ProducerThread extends Thread{
     private static final Logger log = LoggerFactory.getLogger(ProducerThread.class.getName());
     private static final Integer MAX_RANGE = 1;
 
-    private final HttpService httpService;
+    private final EmitterService emitterService;
     private final TopicsService topicsService;
     private final URI emitterUri;
 
     private final ReactiveKafkaProducerTemplate<Integer, String> template;
 
-    public ProducerThread(final ReactiveKafkaProducerTemplate<Integer, String> template, final HttpService httpService, final TopicsService topicsService, final URI emitterUri){
-        this.httpService = httpService;
+    public ProducerThread(final ReactiveKafkaProducerTemplate<Integer, String> template, final EmitterService emitterService, final TopicsService topicsService, final URI emitterUri){
+        this.emitterService = emitterService;
         this.topicsService = topicsService;
         this.emitterUri = emitterUri;
         this.template = template;
@@ -37,7 +38,7 @@ class ProducerThread extends Thread{
 
         try {
 
-            httpService.emitterStream(emitterUri).forEach(
+            emitterService.emitterStream(emitterUri).forEach(
 
                     event -> {
 
@@ -71,7 +72,11 @@ class ProducerThread extends Thread{
                     }
             );
 
-        } catch (Exception e) {
+            throw new EmitterStoppedException(String.format("Emitter [%s] ended.", emitterUri));
+
+        } catch (EmitterStoppedException e) {
+            throw e;
+        } catch (Exception e){
             log.error(e.getMessage());
         }
 
