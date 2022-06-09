@@ -20,10 +20,10 @@ public class TestServiceProperties {
     private ServiceProperties properties;
 
     @Test
-    void TestDefaultProperties() throws URISyntaxException {
-        assertEquals(new URI("http://65.21.235.219:9999/events/main"), properties.getEmitters().get(0));
+    void testDefaultProperties() throws URISyntaxException {
+        assertEquals(new URI("http://65.21.235.219:9999/events/main"), properties.getEmitters().get(1));
         assertEquals("stormeye-kafka", properties.getKafka().getClient());
-        assertEquals("DeployAccepted", properties.getKafka().getTopics().get(2));
+        assertEquals("DeployAccepted", properties.getKafka().getTopics().get(3));
     }
 
 }
