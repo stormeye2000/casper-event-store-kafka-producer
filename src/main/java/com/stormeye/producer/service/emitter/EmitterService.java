@@ -1,4 +1,4 @@
-package com.stormeye.producer.service;
+package com.stormeye.producer.service.emitter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +17,9 @@ import java.util.stream.Stream;
  * connect method will retry n times
  */
 @Service
-class EmitterService {
+public class EmitterService {
 
-    private static final Logger log = LoggerFactory.getLogger(EmitterService.class.getName());
+    private final Logger log = LoggerFactory.getLogger(EmitterService.class.getName());
 
     private HttpClient getClient(){
         return HttpClient.newHttpClient();

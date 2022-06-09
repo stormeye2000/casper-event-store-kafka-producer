@@ -1,4 +1,4 @@
-package com.stormeye.producer.service;
+package com.stormeye.producer.service.producer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +8,12 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import com.stormeye.producer.config.ServiceProperties;
+import com.stormeye.producer.service.emitter.EmitterService;
+import com.stormeye.producer.service.topics.TopicsService;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import reactor.kafka.sender.SenderOptions;
 
 /**
@@ -19,7 +24,7 @@ import reactor.kafka.sender.SenderOptions;
 @Service
 public class ProducerService {
 
-    private static final Logger log = LoggerFactory.getLogger(ProducerService.class.getName());
+    private final Logger log = LoggerFactory.getLogger(ProducerService.class.getName());
 
     private final ServiceProperties properties;
     private final EmitterService emitterService;
@@ -37,6 +42,8 @@ public class ProducerService {
 
         final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate =
                 new ReactiveKafkaProducerTemplate<>(SenderOptions.create(new KafkaProducerService(properties).getProperties()));
+
+        final ExecutorService executor = Executors.newCachedThreadPool();
 
         properties.getEmitters().forEach(
                 emitter -> {
@@ -56,7 +63,9 @@ public class ProducerService {
                         log.info("Successfully connected to emitter: [{}]", emitter);
                         log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
 
-                        new ProducerThread(producerTemplate, emitterService, topicsService, emitter).start();
+                        //Add a callback for exception checking
+                        final Future<Object> future = executor.submit(new ProducerCallable(producerTemplate, emitterService, topicsService, emitter));
+
                     }
 
 

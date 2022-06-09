@@ -12,7 +12,7 @@ import org.springframework.retry.listener.RetryListenerSupport;
  */
 public class EmitterRetry extends RetryListenerSupport {
 
-    private static final Logger log = LoggerFactory.getLogger(RetryListenerSupport.class.getName());
+    private final Logger log = LoggerFactory.getLogger(RetryListenerSupport.class.getName());
 
     @Override
     public <T, E extends Throwable> void onError(final RetryContext context, final RetryCallback<T, E> callback, final Throwable throwable) {

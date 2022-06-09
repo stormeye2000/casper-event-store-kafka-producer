@@ -1,4 +1,4 @@
-package com.stormeye.producer.service;
+package com.stormeye.producer.service.topics;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import com.stormeye.producer.config.ServiceProperties;
  * Maps to Casper Event Types
  */
 @Service
-class TopicsService {
+public class TopicsService {
 
     private final ServiceProperties serviceProperties;
 

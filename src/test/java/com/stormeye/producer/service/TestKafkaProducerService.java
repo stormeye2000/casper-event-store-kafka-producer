@@ -1,7 +1,7 @@
 package com.stormeye.producer.service;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -20,14 +20,21 @@ import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
 import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 import com.stormeye.producer.exceptions.EmitterStoppedException;
+import com.stormeye.producer.service.emitter.EmitterService;
+import com.stormeye.producer.service.producer.KafkaProducerService;
+import com.stormeye.producer.service.producer.ProducerCallable;
+import com.stormeye.producer.service.producer.ProducerService;
+import com.stormeye.producer.service.topics.TopicsService;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import reactor.kafka.sender.SenderOptions;
@@ -41,7 +48,7 @@ public class TestKafkaProducerService {
 
     static final String REACTIVE_INT_KEY_TOPIC = "FinalitySignature";
 
-    public static MockWebServer mockWebServer;
+    public MockWebServer mockWebServer;
 
     @Autowired
     private EmitterService emitterService;
@@ -67,8 +74,6 @@ public class TestKafkaProducerService {
         return props;
     }
 
-
-
     private static String EVENT_STREAM;
 
     static {
@@ -92,56 +97,30 @@ public class TestKafkaProducerService {
     }
 
     @Test
-    void TestEmitterEnded() {
+    void testEmitterEnded() {
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200));
+                //no body so emitter will stop
 
-        Exception ex = new Exception();
+        final ExecutorService executor= Executors.newFixedThreadPool(1);
+        final Future<Object> future = executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
 
-        AsynchTester tester = new AsynchTester(new ProducerThread(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
-
-        try{
-            tester.start();
-            tester.test();
-        } catch (Exception e){
-            ex = e;
+        try {
+            future.get();
+        } catch (ExecutionException e){
+            assertEquals(EmitterStoppedException.class, e.getCause().getClass());
+        } catch (Exception e) {
+            fail();
         }
 
-        assertNotNull(ex);
-        assertTrue(ex instanceof EmitterStoppedException);
+        executor.shutdown();
 
     }
-
-    static class AsynchTester{
-        private Thread thread;
-        private EmitterStoppedException exc;
-
-        public AsynchTester(final Runnable runnable){
-            thread = new Thread(() -> {
-                try{
-                    runnable.run();
-                }catch(EmitterStoppedException e){
-                    exc = e;
-                }
-            });
-        }
-
-        public void start(){
-            thread.start();
-        }
-
-        public void test() throws InterruptedException{
-            thread.join();
-            if (exc != null)
-                throw exc;
-        }
-    }
-
 
     @Test
     @Disabled
-    void TestProducer() throws InterruptedException {
+    void testProducer() {
 
         this.reactiveKafkaProducerTemplate = new ReactiveKafkaProducerTemplate<>(SenderOptions.create(producerConfigs()),
                 new MessagingMessageConverter());
@@ -151,25 +130,6 @@ public class TestKafkaProducerService {
                 .setBody(EVENT_STREAM)
                 .setResponseCode(200));
 
-        CountDownLatch latch = new CountDownLatch(3);
-        List<ProducerThread> tasks = new ArrayList<>();
-        tasks.add(new ProducerThread(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
-        tasks.add(new ProducerThread(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
-        tasks.add(new ProducerThread(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
-
-        Executor executor = Executors.newFixedThreadPool(tasks.size());
-
-        for (ProducerThread thread: tasks){
-            executor.execute(thread);
-        }
-        latch.await(1, TimeUnit.MINUTES);
-
-        for(final ProducerThread thread: tasks){
-            if( ! thread.isAlive()){
-                assertTrue(false);
-            }
-        }
-       assertTrue(true);
 
     }
 

@@ -1,24 +1,24 @@
-package com.stormeye.producer.service;
+package com.stormeye.producer.service.producer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import com.stormeye.producer.domain.Event;
 import com.stormeye.producer.exceptions.EmitterStoppedException;
+import com.stormeye.producer.service.emitter.EmitterService;
+import com.stormeye.producer.service.topics.TopicsService;
 
 import java.net.URI;
-import java.util.Date;
+import java.util.concurrent.Callable;
 import reactor.core.publisher.Flux;
 import reactor.kafka.sender.SenderRecord;
 
 /**
- * Starts a kafka producer in its own thread
- * Events are read from the emitter and their event type is mapped to a kafka topic
- * Each event type is then written to its own corresponding topic
+ * Callable producer class that enables concurrency on the http emitters
+ * Also exposes exception handling to the calling method
  */
-class ProducerThread extends Thread{
-
-    private static final Logger log = LoggerFactory.getLogger(ProducerThread.class.getName());
+public class ProducerCallable implements Callable<Object> {
+    private final Logger log = LoggerFactory.getLogger(ProducerCallable.class.getName());
     private static final Integer MAX_RANGE = 1;
 
     private final EmitterService emitterService;
@@ -27,15 +27,15 @@ class ProducerThread extends Thread{
 
     private final ReactiveKafkaProducerTemplate<Integer, String> template;
 
-    public ProducerThread(final ReactiveKafkaProducerTemplate<Integer, String> template, final EmitterService emitterService, final TopicsService topicsService, final URI emitterUri){
+    public ProducerCallable(final ReactiveKafkaProducerTemplate<Integer, String> template, final EmitterService emitterService, final TopicsService topicsService, final URI emitterUri){
         this.emitterService = emitterService;
         this.topicsService = topicsService;
         this.emitterUri = emitterUri;
         this.template = template;
     }
 
-    public void run() {
-
+    @Override
+    public Object call() {
         try {
 
             emitterService.emitterStream(emitterUri).forEach(
@@ -53,7 +53,7 @@ class ProducerThread extends Thread{
                                 final Flux<SenderRecord<Integer, String, Integer>> outboundFlux = Flux.range(0, MAX_RANGE)
                                         .map(i ->
                                                 SenderRecord.create(topicsService.getTopic(event), 0,
-                                                        new Date().getTime(),
+                                                        System.currentTimeMillis(),
                                                         i, new Event(emitterUri.toString(), event).toString(), i)
                                         );
 
@@ -74,13 +74,11 @@ class ProducerThread extends Thread{
 
             throw new EmitterStoppedException(String.format("Emitter [%s] ended.", emitterUri));
 
-        } catch (EmitterStoppedException e) {
-            throw e;
         } catch (Exception e){
-            log.error(e.getMessage());
+            throw new EmitterStoppedException(e.getMessage());
         }
 
-
     }
+
 
 }

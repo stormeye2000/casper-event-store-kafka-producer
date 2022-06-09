@@ -13,6 +13,8 @@ import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetryTemplate;
 import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
+import com.stormeye.producer.service.emitter.EmitterService;
+import com.stormeye.producer.service.topics.TopicsService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -57,7 +59,7 @@ public class TestHttpService {
     }
 
     @Test
-    void TestInvalidConnection() {
+    void testInvalidConnection() {
 
         Assertions.assertThrows(Exception.class, () -> {
             retryTemplate.execute(ctx -> {
@@ -69,7 +71,7 @@ public class TestHttpService {
     }
 
     @Test
-    void TestValidConnection() {
+    void testValidConnection() {
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200));
@@ -88,7 +90,7 @@ public class TestHttpService {
 
 
     @Test
-    void TestSimpleHttp() throws IOException, InterruptedException {
+    void testSimpleHttp() throws IOException, InterruptedException {
         mockWebServer.enqueue(new MockResponse()
                 .addHeader("Content-Type", "application/json; charset=utf-8")
                 .setBody("{\"id\": 1}")
@@ -101,7 +103,7 @@ public class TestHttpService {
     }
 
     @Test
-    void TestWithEvents() throws IOException, InterruptedException {
+    void testWithEvents() throws IOException, InterruptedException {
 
         mockWebServer.enqueue(new MockResponse()
                 .addHeader("Content-Type", "application/json; charset=utf-8")

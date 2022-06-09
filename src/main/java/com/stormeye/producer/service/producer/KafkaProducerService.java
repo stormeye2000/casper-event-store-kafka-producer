@@ -1,4 +1,4 @@
-package com.stormeye.producer.service;
+package com.stormeye.producer.service.producer;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.IntegerSerializer;
