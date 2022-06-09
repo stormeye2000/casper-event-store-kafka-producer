@@ -19,5 +19,4 @@ public class EmitterRetry extends RetryListenerSupport {
         log.warn("Error connecting to emitter: {}", throwable.getMessage());
         super.onError(context, callback, throwable);
     }
-
 }

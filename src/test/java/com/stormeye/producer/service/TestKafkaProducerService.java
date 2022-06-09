@@ -58,7 +58,7 @@ public class TestKafkaProducerService {
 
 
     @ClassRule
-    public static EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true);
+    public static final EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true);
 
 
     private ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate;
@@ -115,7 +115,6 @@ public class TestKafkaProducerService {
         }
 
         executor.shutdown();
-
     }
 
     @Test
@@ -129,9 +128,5 @@ public class TestKafkaProducerService {
                 .addHeader("Content-Type", "application/json; charset=utf-8")
                 .setBody(EVENT_STREAM)
                 .setResponseCode(200));
-
-
     }
-
-
 }

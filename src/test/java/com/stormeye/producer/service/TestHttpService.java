@@ -41,10 +41,10 @@ public class TestHttpService {
 
     static {
         try {
+            //noinspection resource
             EVENT_STREAM = new String(
                     (TestHttpService.class.getClassLoader().
-                            getResourceAsStream
-                                    ("events.stream"))
+                            getResourceAsStream("events.stream"))
                             .readAllBytes());
 
         } catch (IOException e) {
@@ -61,13 +61,10 @@ public class TestHttpService {
     @Test
     void testInvalidConnection() {
 
-        Assertions.assertThrows(Exception.class, () -> {
-            retryTemplate.execute(ctx -> {
-                service.connect(URI.create("http://localhost:9999"));
-                return null;
-            });
-        });
-
+        Assertions.assertThrows(Exception.class, () -> retryTemplate.execute(ctx -> {
+            service.connect(URI.create("http://localhost:9999"));
+            return null;
+        }));
     }
 
     @Test
@@ -99,7 +96,6 @@ public class TestHttpService {
         service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))).forEach(
                 event -> assertEquals("{\"id\": 1}", event)
         );
-
     }
 
     @Test
@@ -111,9 +107,7 @@ public class TestHttpService {
                 .setResponseCode(200));
 
         service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))).forEach(
-           event ->     {
-               assertTrue(topics.hasTopic(event));
-           }
+           event -> assertTrue(topics.hasTopic(event))
         );
     }
 

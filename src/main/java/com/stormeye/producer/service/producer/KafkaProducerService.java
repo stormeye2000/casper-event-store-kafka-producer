@@ -26,7 +26,7 @@ public class KafkaProducerService {
         final Map<String, Object> producerProps = new HashMap<>();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getKafka().getServer() + ":" + properties.getKafka().getPort());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
-        //The consumer needs this client_id as the group_id i think
+        //The consumer needs this client_id as the group_id I think
         producerProps.put(ProducerConfig.CLIENT_ID_CONFIG, properties.getKafka().getClient());
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
@@ -41,7 +41,7 @@ public class KafkaProducerService {
         final Map<String, Object> producerProps = new HashMap<>();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getKafka().getServer() + ":" + properties.getKafka().getPort());
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
-        //The consumer needs this client_id as the group_id i think
+        //The consumer needs this client_id as the group_id I think
         producerProps.put(ProducerConfig.CLIENT_ID_CONFIG, properties.getKafka().getClient());
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 

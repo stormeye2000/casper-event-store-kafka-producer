@@ -15,7 +15,6 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "services")
 public class ServiceProperties {
-
     private List<URI> emitters;
     private Kafka kafka;
 
@@ -72,10 +71,5 @@ public class ServiceProperties {
         public void setTopics(final List<String> topics) {
             this.topics = topics;
         }
-
     }
-
-
-
-
 }

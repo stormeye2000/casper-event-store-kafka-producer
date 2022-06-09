@@ -57,7 +57,6 @@ public class ProducerCallable implements Callable<Object> {
                                                         i, new Event(emitterUri.toString(), event).toString(), i)
                                         );
 
-
                                 template.send(outboundFlux)
                                         .doOnError(e-> {
                                             log.error("Send failed for event: {}", event);
@@ -77,8 +76,5 @@ public class ProducerCallable implements Callable<Object> {
         } catch (Exception e){
             throw new EmitterStoppedException(e.getMessage());
         }
-
     }
-
-
 }

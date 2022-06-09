@@ -8,5 +8,4 @@ public class EmitterStoppedException extends RuntimeException{
     public EmitterStoppedException(final String message){
         super(message);
     }
-
 }
