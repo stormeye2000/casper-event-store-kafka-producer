@@ -16,6 +16,8 @@ services:
       - Step
       - Fault
 logging:
+  file:
+    name: ${HOME}/producer.log
   level:
     com:
       stormeye: ${LOG_LEVEL:DEBUG}
