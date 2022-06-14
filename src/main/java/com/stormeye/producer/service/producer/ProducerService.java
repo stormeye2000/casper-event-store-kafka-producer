@@ -13,8 +13,8 @@ import com.stormeye.producer.service.topics.TopicsService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import reactor.kafka.sender.SenderOptions;
+
 
 /**
  * Service to start the kafka producer
@@ -29,13 +29,14 @@ public class ProducerService {
     private final ServiceProperties properties;
     private final EmitterService emitterService;
     private final TopicsService topicsService;
-    private final RetryTemplate retryTemplate;
+    private final RetryTemplate initialRetryTemplate;
 
-    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final EmitterService emitterService, final TopicsService topicsService, final RetryTemplate retryTemplate) {
+    public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final EmitterService emitterService, final TopicsService topicsService,
+                         final RetryTemplate initialRetryTemplate) {
         this.properties = properties;
         this.emitterService = emitterService;
         this.topicsService = topicsService;
-        this.retryTemplate = retryTemplate;
+        this.initialRetryTemplate = initialRetryTemplate;
     }
 
     public void startEventConsumers() {
@@ -49,7 +50,7 @@ public class ProducerService {
 
                         RetryContext context = null;
                         try {
-                            context = retryTemplate.execute(ctx -> {
+                            context = initialRetryTemplate.execute(ctx -> {
                                 emitterService.connect(emitter);
                                 return ctx;
                             });
@@ -62,11 +63,12 @@ public class ProducerService {
                             log.info("Successfully connected to emitter: [{}]", emitter);
                             log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
 
-                            //Add a callback for exception checking
-                            final Future<Object> future = executor.submit(new ProducerCallable(producerTemplate, emitterService, topicsService, emitter));
+                            executor.submit(new ProducerCallable(producerTemplate, topicsService, emitter, emitterService.emitterStream(emitter)));
+
                         }
                     }
             );
         }
+
     }
 }

@@ -87,7 +87,7 @@ public class TestHttpService {
 
 
     @Test
-    void testSimpleHttp() throws IOException, InterruptedException {
+    void testSimpleHttp() {
         mockWebServer.enqueue(new MockResponse()
                 .addHeader("Content-Type", "application/json; charset=utf-8")
                 .setBody("{\"id\": 1}")
@@ -99,7 +99,7 @@ public class TestHttpService {
     }
 
     @Test
-    void testWithEvents() throws IOException, InterruptedException {
+    void testWithEvents() {
 
         mockWebServer.enqueue(new MockResponse()
                 .addHeader("Content-Type", "application/json; charset=utf-8")

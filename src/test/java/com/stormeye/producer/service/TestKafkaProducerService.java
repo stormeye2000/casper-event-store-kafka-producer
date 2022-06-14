@@ -96,15 +96,19 @@ public class TestKafkaProducerService {
         mockWebServer.start();
     }
 
+
     @Test
-    void testEmitterEnded() {
+    void testEmitterEndedFutures() {
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200));
-                //no body so emitter will stop
+        //no body so emitter will stop
 
-        final ExecutorService executor= Executors.newFixedThreadPool(1);
-        final Future<Object> future = executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, emitterService, topics, URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))));
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final URI emitter = URI.create(String.format("http://localhost:%s", mockWebServer.getPort()));
+
+        final Future<Object> future = executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, topics, emitter,
+                emitterService.emitterStream(emitter)));
 
         try {
             future.get();
@@ -115,6 +119,7 @@ public class TestKafkaProducerService {
         }
 
         executor.shutdown();
+
     }
 
     @Test

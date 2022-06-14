@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import com.stormeye.producer.domain.Event;
 import com.stormeye.producer.exceptions.EmitterStoppedException;
-import com.stormeye.producer.service.emitter.EmitterService;
 import com.stormeye.producer.service.topics.TopicsService;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.kafka.sender.SenderRecord;
 
@@ -21,24 +21,24 @@ public class ProducerCallable implements Callable<Object> {
     private final Logger log = LoggerFactory.getLogger(ProducerCallable.class.getName());
     private static final Integer MAX_RANGE = 1;
 
-    private final EmitterService emitterService;
     private final TopicsService topicsService;
     private final URI emitterUri;
+    private final Stream<String> emitterStream;
 
     private final ReactiveKafkaProducerTemplate<Integer, String> template;
 
-    public ProducerCallable(final ReactiveKafkaProducerTemplate<Integer, String> template, final EmitterService emitterService, final TopicsService topicsService, final URI emitterUri){
-        this.emitterService = emitterService;
+    public ProducerCallable(final ReactiveKafkaProducerTemplate<Integer, String> template, final TopicsService topicsService, final URI emitterUri, final Stream<String> emitterStream){
         this.topicsService = topicsService;
         this.emitterUri = emitterUri;
         this.template = template;
+        this.emitterStream = emitterStream;
     }
 
     @Override
     public Object call() {
         try {
 
-            emitterService.emitterStream(emitterUri).forEach(
+            emitterStream.forEach(
 
                     event -> {
 
@@ -71,7 +71,7 @@ public class ProducerCallable implements Callable<Object> {
                     }
             );
 
-            throw new EmitterStoppedException(String.format("Emitter [%s] ended.", emitterUri));
+            throw new EmitterStoppedException(String.format("Emitter [%s] stopped.", emitterUri));
 
         } catch (Exception e){
             throw new EmitterStoppedException(e.getMessage());

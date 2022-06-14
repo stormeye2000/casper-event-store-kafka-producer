@@ -3,6 +3,7 @@ package com.stormeye.producer.service.emitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import com.stormeye.producer.exceptions.EmitterStoppedException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,8 +30,13 @@ public class EmitterService {
         return HttpRequest.newBuilder(emitter).GET().build();
     }
 
-    public Stream<String> emitterStream(final URI emitter) throws IOException, InterruptedException {
-        return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
+    public Stream<String> emitterStream(final URI emitter) {
+        try {
+            return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
+        } catch (IOException | InterruptedException e) {
+           throw new EmitterStoppedException(e.getMessage());
+        }
+
     }
 
     public void connect(final URI emitter) throws IOException, InterruptedException {

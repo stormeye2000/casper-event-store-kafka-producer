@@ -2,7 +2,7 @@ package com.stormeye.producer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
@@ -15,15 +15,17 @@ import org.springframework.retry.support.RetryTemplate;
 public class AppConfig {
 
     @Bean
-    public RetryTemplate getRetryTemplate() {
+    public RetryTemplate getInitialRetryTemplate() {
 
         final RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.registerListener(new EmitterRetry());
+        retryTemplate.registerListener(new HttpEmitterConnectionRetry());
 
-        final FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
-        fixedBackOffPolicy.setBackOffPeriod(2000L);
+        final ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
+        exponentialBackOffPolicy.setMaxInterval(50000L);
+        exponentialBackOffPolicy.setInitialInterval(5000L);
+        exponentialBackOffPolicy.setMultiplier(2);
 
-        retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
+        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
 
         final SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
         retryPolicy.setMaxAttempts(5);
@@ -32,4 +34,6 @@ public class AppConfig {
 
         return retryTemplate;
     }
+
+
 }

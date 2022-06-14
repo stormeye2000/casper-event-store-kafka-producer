@@ -10,7 +10,7 @@ import org.springframework.retry.listener.RetryListenerSupport;
  * Overridden methods in the Retry Template to log errors
  * Initial connection to an emitter node is passed through this template
  */
-public class EmitterRetry extends RetryListenerSupport {
+public class HttpEmitterConnectionRetry extends RetryListenerSupport {
 
     private final Logger log = LoggerFactory.getLogger(RetryListenerSupport.class.getName());
 
