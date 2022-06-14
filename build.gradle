@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version "${springBootVersion}"
 	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 	id 'java'
+	id 'maven-publish'
 }
 
 group = 'com.stormeye'
@@ -35,7 +36,6 @@ dependencies {
 	testImplementation "com.squareup.okhttp3:mockwebserver:${mockwebserverVersion}"
 
 }
-
 
 
 test {
