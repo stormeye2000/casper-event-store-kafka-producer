@@ -22,6 +22,8 @@ dependencies {
 
 	implementation "org.apache.kafka:kafka-streams:${kafkaVersion}"
 	implementation "io.projectreactor.kafka:reactor-kafka:${reactorKafkaVersion}"
+	implementation group: 'org.apache.commons', name: 'commons-configuration2', version: '2.7'
+	implementation 'me.paulschwarz:spring-dotenv:2.3.0'
 
 	implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
 	implementation "org.apache.httpcomponents:httpclient:${httpclientversion}"

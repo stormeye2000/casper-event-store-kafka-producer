@@ -4,9 +4,6 @@ services:
     - ${CASPER_EVENTS_DEPLOYS:http://65.21.235.219:9999/events/deploys}
     - ${CASPER_EVENTS_SIGS:http://65.21.235.219:9999/events/sigs}
   kafka:
-    server: ${KAFKA_BOOTSTRAP_SERVER:localhost}
-    port: ${KAFKA_BOOTSTRAP_PORT:9092}
-    client: ${KAFKA_CLIENT_ID:stormeye-kafka}
     topics:
       - DeployProcessed
       - DeployExpired
@@ -27,5 +24,9 @@ spring:
   output:
     ansi:
       enabled: ALWAYS # force pretty output!
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    producer:
+      client-id: ${KAFKA_CLIENT_ID:stormeye-kafka}
   application:
     name: Casper Event Store Kafka Producer

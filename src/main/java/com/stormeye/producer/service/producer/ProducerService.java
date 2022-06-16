@@ -13,7 +13,6 @@ import com.stormeye.producer.service.topics.TopicsService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import reactor.kafka.sender.SenderOptions;
 
 
 /**
@@ -30,18 +29,20 @@ public class ProducerService {
     private final EmitterService emitterService;
     private final TopicsService topicsService;
     private final RetryTemplate initialRetryTemplate;
+    private final ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate;
 
     public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties, final EmitterService emitterService, final TopicsService topicsService,
-                         final RetryTemplate initialRetryTemplate) {
+                           final RetryTemplate initialRetryTemplate, final ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate) {
         this.properties = properties;
         this.emitterService = emitterService;
         this.topicsService = topicsService;
         this.initialRetryTemplate = initialRetryTemplate;
+        this.reactiveKafkaProducerTemplate = reactiveKafkaProducerTemplate;
     }
 
     public void startEventConsumers() {
 
-        try (final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate = new ReactiveKafkaProducerTemplate<>(SenderOptions.create(new KafkaProducerService(properties).getProperties()))) {
+        try {
 
             final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -63,12 +64,12 @@ public class ProducerService {
                             log.info("Successfully connected to emitter: [{}]", emitter);
                             log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
 
-                            executor.submit(new ProducerCallable(producerTemplate, topicsService, emitter, emitterService.emitterStream(emitter)));
+                            executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, topicsService, emitter, emitterService.emitterStream(emitter)));
 
                         }
                     }
             );
-        }
+        } catch (Exception e){}
 
     }
 }

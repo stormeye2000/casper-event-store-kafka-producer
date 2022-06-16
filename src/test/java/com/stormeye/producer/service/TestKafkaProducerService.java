@@ -21,7 +21,6 @@ import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 import com.stormeye.producer.exceptions.EmitterStoppedException;
 import com.stormeye.producer.service.emitter.EmitterService;
-import com.stormeye.producer.service.producer.KafkaProducerService;
 import com.stormeye.producer.service.producer.ProducerCallable;
 import com.stormeye.producer.service.producer.ProducerService;
 import com.stormeye.producer.service.topics.TopicsService;
@@ -39,8 +38,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import reactor.kafka.sender.SenderOptions;
 
-
-@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, KafkaProducerService.class, ProducerService.class, AppConfig.class})
+@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, ProducerService.class, AppConfig.class})
 @EnableConfigurationProperties(value = ServiceProperties.class)
 @EnableAutoConfiguration
 @EmbeddedKafka(topics = TestKafkaProducerService.REACTIVE_INT_KEY_TOPIC, partitions = 1)
