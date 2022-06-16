@@ -43,7 +43,5 @@ jobs:
     - name: Run Kafka Producer
       run: |
         sudo pkill -f 'java -jar'
-        rm ${HOME}/producer.log
-        touch ${HOME}/producer.log
         sudo java -jar /home/ec2-user/actions-runner/cspr-kafka-producer/casper-event-store-kafka-producer/casper-event-store-kafka-producer/build/libs/producer-0.0.1-SNAPSHOT.jar &
 
