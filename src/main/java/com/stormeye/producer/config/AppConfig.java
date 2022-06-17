@@ -26,7 +26,7 @@ public class AppConfig {
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
 
-    @Value("${KAFKA_BOOTSTRAP_SERVER}")
+    @Value("${KAFKA_BOOTSTRAP_SERVER:localhost:9092}")
     private String bootstrapServers;
 
     @Bean
