@@ -16,8 +16,6 @@ logging:
   level:
     com:
       stormeye: ${LOG_LEVEL:DEBUG}
-  file:
-    name: ${HOME}/producer.log
 server:
   port: 8080
 spring:
