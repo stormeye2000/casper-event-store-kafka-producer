@@ -23,10 +23,11 @@ import reactor.kafka.sender.SenderOptions;
 @Configuration
 public class AppConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
+
+    @Value("${KAFKA_BOOTSTRAP_SERVER}")
+    private String bootstrapServers;
 
     @Bean
     public RetryTemplate getInitialRetryTemplate() {
