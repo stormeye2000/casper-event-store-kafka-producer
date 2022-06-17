@@ -1,0 +1,5 @@
+spring:
+  kafka:
+    bootstrap-servers: 172.31.8.239:9092
+    producer:
+      client-id: stormeye-kafka-dev
