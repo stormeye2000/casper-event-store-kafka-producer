@@ -13,17 +13,17 @@ services:
       - Step
       - Fault
 logging:
-  file:
-    name: ${HOME}/producer.log
   level:
     com:
       stormeye: ${LOG_LEVEL:DEBUG}
+  file:
+    name: ${HOME}/producer.log
 server:
   port: 8080
 spring:
   output:
     ansi:
-      enabled: ALWAYS # force pretty output!
+      enabled: ALWAYS
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
     producer:
