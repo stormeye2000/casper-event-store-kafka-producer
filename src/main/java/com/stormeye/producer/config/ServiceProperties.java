@@ -18,7 +18,6 @@ import java.util.List;
 @EnableConfigurationProperties
 public class ServiceProperties {
     private List<URI> emitters;
-    private Kafka kafka;
 
     public List<URI> getEmitters() {
         return emitters;
@@ -28,23 +27,4 @@ public class ServiceProperties {
         this.emitters = emitters;
     }
 
-    public Kafka getKafka() {
-        return kafka;
-    }
-
-    public void setKafka(final Kafka kafka) {
-        this.kafka = kafka;
-    }
-
-    public final static class Kafka {
-        private List<String> topics;
-
-        public List<String> getTopics() {
-            return topics;
-        }
-
-        public void setTopics(final List<String> topics) {
-            this.topics = topics;
-        }
-    }
 }

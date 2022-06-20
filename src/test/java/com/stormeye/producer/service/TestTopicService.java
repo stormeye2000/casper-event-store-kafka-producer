@@ -5,15 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.stormeye.producer.config.AppConfig;
-import com.stormeye.producer.config.ServiceProperties;
-import com.stormeye.producer.service.emitter.EmitterService;
 import com.stormeye.producer.service.topics.TopicsService;
 
-@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, AppConfig.class})
-@EnableConfigurationProperties(value = {ServiceProperties.class})
+@SpringBootTest(classes = {TopicsService.class})
 @EnableAutoConfiguration
 public class TestTopicService {
     @Autowired

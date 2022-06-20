@@ -3,15 +3,6 @@ services:
     - ${CASPER_EVENTS_MAIN:http://65.21.235.219:9999/events/main}
     - ${CASPER_EVENTS_DEPLOYS:http://65.21.235.219:9999/events/deploys}
     - ${CASPER_EVENTS_SIGS:http://65.21.235.219:9999/events/sigs}
-  kafka:
-    topics:
-      - DeployProcessed
-      - DeployExpired
-      - BlockAdded
-      - DeployAccepted
-      - FinalitySignature
-      - Step
-      - Fault
 logging:
   level:
     com:

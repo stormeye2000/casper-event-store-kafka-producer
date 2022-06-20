@@ -22,6 +22,4 @@ class StartUp implements ApplicationRunner {
         service.startEventConsumers();
     }
 
-
-
 }

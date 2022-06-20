@@ -1,8 +1,7 @@
 package com.stormeye.producer.service.topics;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import com.stormeye.producer.config.ServiceProperties;
+
 
 /**
  * Contains interactions with the kafka topics
@@ -11,26 +10,24 @@ import com.stormeye.producer.config.ServiceProperties;
 @Service
 public class TopicsService {
 
-    private final ServiceProperties serviceProperties;
-
-    public TopicsService(@Qualifier("ServiceProperties") final ServiceProperties serviceProperties) {
-        this.serviceProperties = serviceProperties;
-    }
-
     public boolean hasTopic(final String event) {
-        return serviceProperties.getKafka()
-                .getTopics()
-                .stream()
-                .anyMatch(event::contains);
+        for(Topics topic : Topics.values()) {
+            if (event.contains(topic.toString())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public String getTopic(final String event) {
-        return serviceProperties.getKafka()
-                .getTopics()
-                .stream()
-                .filter(event::contains)
-                .findAny()
-                .orElse(null);
+        for(Topics topic : Topics.values()) {
+            if (event.contains(topic.toString())) {
+                return topic.toString();
+            }
+        }
+
+        return null;
     }
 
 }
