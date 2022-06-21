@@ -2,6 +2,8 @@ package com.stormeye.producer.service.topics;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 /**
  * Contains interactions with the kafka topics
@@ -12,7 +14,7 @@ public class TopicsService {
 
     public boolean hasTopic(final String event) {
         for(Topics topic : Topics.values()) {
-            if (event.contains(topic.toString())) {
+            if (event.contains(topic.toCamelCase(topic))) {
                 return true;
             }
         }
@@ -20,14 +22,14 @@ public class TopicsService {
         return false;
     }
 
-    public String getTopic(final String event) {
+    public Optional<String> getTopic(final String event) {
         for(Topics topic : Topics.values()) {
-            if (event.contains(topic.toString())) {
-                return topic.toString();
+            if (event.contains(topic.toCamelCase(topic))) {
+                return Optional.ofNullable(topic.toCamelCase(topic));
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
 }

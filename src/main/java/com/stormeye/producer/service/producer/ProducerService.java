@@ -69,7 +69,9 @@ public class ProducerService {
                         }
                     }
             );
-        } catch (Exception e){}
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
 
     }
 }

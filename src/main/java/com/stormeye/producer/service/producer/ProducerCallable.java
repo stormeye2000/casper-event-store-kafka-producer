@@ -8,6 +8,7 @@ import com.stormeye.producer.exceptions.EmitterStoppedException;
 import com.stormeye.producer.service.topics.TopicsService;
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
@@ -44,15 +45,15 @@ public class ProducerCallable implements Callable<Object> {
 
                         if (topicsService.hasTopic(event)){
 
-                            final String topic = topicsService.getTopic(event);
+                            final Optional<String> topic = topicsService.getTopic(event);
 
-                            if (topic != null) {
+                            if (topic.isPresent()) {
 
-                                log.debug("Emitter: [{}] Topic: [{}] - Event : {}", emitterUri.toString(), topic, event);
+                                log.debug("Emitter: [{}] Topic: [{}] - Event : {}", emitterUri.toString(), topic.get(), event);
 
                                 final Flux<SenderRecord<Integer, String, Integer>> outboundFlux = Flux.range(0, MAX_RANGE)
                                         .map(i ->
-                                                SenderRecord.create(topicsService.getTopic(event), 0,
+                                                SenderRecord.create(topic.get(), 0,
                                                         System.currentTimeMillis(),
                                                         i, new Event(emitterUri.toString(), event).toString(), i)
                                         );
