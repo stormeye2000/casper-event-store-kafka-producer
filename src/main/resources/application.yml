@@ -1,8 +1,8 @@
 services:
   emitters:
-    - ${CASPER_EVENTS_MAIN:http://65.21.235.219:9999/events/main}
-    - ${CASPER_EVENTS_DEPLOYS:http://65.21.235.219:9999/events/deploys}
-    - ${CASPER_EVENTS_SIGS:http://65.21.235.219:9999/events/sigs}
+    - ${CASPER_EVENTS_MAIN:http://13.41.171.131:8082/test-emitter/events/main}
+    - ${CASPER_EVENTS_DEPLOYS:http://13.41.171.131:8082/test-emitter/events/deploys}
+    - ${CASPER_EVENTS_SIGShttp://13.41.171.131:8082/test-emitter/events/sigs}
 logging:
   level:
     com:
