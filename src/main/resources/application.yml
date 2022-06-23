@@ -5,16 +5,16 @@ services:
     - http//13.41.171.131:8082/test-emitter/events/sig
     - http://13.41.171.131:8082/test-emitter/events/main
     - http://13.41.171.131:8082/test-emitter/events/deploys
-    - http//13.41.171.131:8082/test-emitter/events/sig
+    - http://13.41.171.131:8082/test-emitter/events/sig
     - http://13.41.171.131:8082/test-emitter/events/main
     - http://13.41.171.131:8082/test-emitter/events/deploys
     - http//13.41.171.131:8082/test-emitter/events/sig
     - http://13.41.171.131:8082/test-emitter/events/main
     - http://13.41.171.131:8082/test-emitter/events/deploys
-    - http//13.41.171.131:8082/test-emitter/events/sig
+    - http://13.41.171.131:8082/test-emitter/events/sig
     - http://13.41.171.131:8082/test-emitter/events/main
     - http://13.41.171.131:8082/test-emitter/events/deploys
-    - http//13.41.171.131:8082/test-emitter/events/sig
+    - http://13.41.171.131:8082/test-emitter/events/sig
 logging:
   level:
     com:
