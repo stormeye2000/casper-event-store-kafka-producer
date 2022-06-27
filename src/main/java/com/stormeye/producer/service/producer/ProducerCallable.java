@@ -55,7 +55,7 @@ public class ProducerCallable implements Callable<Object> {
                                         .map(i ->
                                                 SenderRecord.create(topic.get(), 0,
                                                         System.currentTimeMillis(),
-                                                        i, new Event(emitterUri.toString(), event).toString(), i)
+                                                        null, new Event(emitterUri.toString(), event).toString(), i)
                                         );
 
                                 template.send(outboundFlux)
