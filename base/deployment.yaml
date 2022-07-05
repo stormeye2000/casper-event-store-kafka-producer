@@ -16,7 +16,7 @@ spec:
         app: producer
     spec:
       containers:
-        - image: nginx
+        - image:
           imagePullPolicy: IfNotPresent
           name: producer
           ports:
