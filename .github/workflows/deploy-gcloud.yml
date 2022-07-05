@@ -13,8 +13,8 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: cspr-google-kafka-cluster
   GKE_ZONE: europe-west2-a
-  DEPLOYMENT_NAME: casper-event-store-kafka-producer
-  IMAGE: static-site
+  DEPLOYMENT_NAME: producer
+  IMAGE: casper-event-store-kafka-producer
 
 jobs:
   setup-build-publish-deploy:
