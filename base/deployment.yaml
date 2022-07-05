@@ -16,7 +16,7 @@ spec:
         app: producer
     spec:
       containers:
-        - image: null
+        - image: the-container
           imagePullPolicy: IfNotPresent
           name: producer
           ports:
