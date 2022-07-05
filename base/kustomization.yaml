@@ -1,0 +1,6 @@
+commonLabels:
+  app: producer
+
+resources:
+  - deployment.yaml
+  - service.yaml
