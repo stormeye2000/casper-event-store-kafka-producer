@@ -11,6 +11,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GAR_LOCATION: europe-west2
   GKE_CLUSTER: cspr-google-kafka-cluster
   GKE_ZONE: europe-west2-a
   DEPLOYMENT_NAME: producer
