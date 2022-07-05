@@ -16,7 +16,7 @@ spec:
         app: producer
     spec:
       containers:
-        - image: the-container
+        - image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE
           imagePullPolicy: IfNotPresent
           name: producer
           ports:
