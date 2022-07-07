@@ -11,6 +11,6 @@ logging:
     name: /var/log/cspr-producer.log
 spring:
   kafka:
-    bootstrap-servers: 10.12.0.8:9092
+    bootstrap-servers: kafka-broker:9093
     producer:
       client-id: stormeye-kafka-dev
