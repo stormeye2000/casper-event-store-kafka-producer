@@ -6,18 +6,6 @@ plugins {
 	id 'application'
 }
 
-tasks.register("bootRunDev") {
-	group = "application"
-	description = "Runs the Spring Boot application with the dev profile"
-	doFirst {
-		tasks.bootRun.configure {
-			systemProperty("spring.profiles.active", "dev")
-		}
-	}
-	finalizedBy("bootRun")
-}
-
-
 group = 'com.stormeye'
 version = '0.0.1'
 sourceCompatibility = '11'
@@ -52,6 +40,16 @@ dependencies {
 
 }
 
+tasks.register("bootRunDev") {
+	group = "application"
+	description = "Runs the Spring Boot application with the dev profile"
+	doFirst {
+		tasks.bootRun.configure {
+			systemProperty("spring.profiles.active", "dev")
+		}
+	}
+	finalizedBy("bootRun")
+}
 
 test {
 	useJUnitPlatform()
