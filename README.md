@@ -23,7 +23,9 @@ Install Kafka and Zookeeper and run from kafka bin folder:
 ```bash
 zookeeper-server-start ../../libexec/config/zookeeper.properties
 
-kakfka-server-start ../../libexec/config/serfer.properties
+kakfka-server-start ../../libexec/config/server.properties
+
+#Create the topics, obly needed on the initial run
 
 kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic DeployProcessed
 
@@ -32,5 +34,11 @@ kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 -
 kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic DeployAccepted
 
 kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic FinalitySignature
+
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic DeployExpired
+
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic Step
+
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic Fault
 ```
 
