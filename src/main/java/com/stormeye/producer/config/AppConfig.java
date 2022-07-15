@@ -5,6 +5,7 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,11 +27,14 @@ import reactor.kafka.sender.SenderOptions;
 public class AppConfig {
 
     private final Logger log = LoggerFactory.getLogger(AppConfig.class.getName());
+    private final ServiceProperties properties;
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
+
+    public AppConfig(@Qualifier("ServiceProperties") final ServiceProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     public RetryTemplate getInitialRetryTemplate() {
@@ -57,6 +61,9 @@ public class AppConfig {
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
+
+        final String bootstrapServers = properties.getBootstrapServers();
+
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);

@@ -12,6 +12,6 @@ logging:
 spring:
   kafka:
 #    bootstrap-servers: http://10.16.11.130:9092
-    bootstrap-servers: ${KAFKA_SERVICE_SERVICE_HOST}:${KAFKA_SERVICE_SERVICE_POST}
+#    bootstrap-servers: ${KAFKA_SERVICE_SERVICE_HOST}:${KAFKA_SERVICE_SERVICE_POST}
     producer:
       client-id: stormeye-kafka-dev

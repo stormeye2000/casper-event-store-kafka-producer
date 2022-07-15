@@ -10,9 +10,14 @@ group = 'com.stormeye'
 version = '0.0.1'
 sourceCompatibility = '11'
 
+bootJar {
+	archiveFileName = "producer.jar"
+}
+
 repositories {
 	mavenCentral()
 }
+
 
 dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
@@ -38,17 +43,6 @@ dependencies {
 	testImplementation "org.springframework.kafka:spring-kafka-test:${kafkaSpringVersion}"
 	testImplementation "com.squareup.okhttp3:mockwebserver:${mockwebserverVersion}"
 
-}
-
-tasks.register("bootRunDev") {
-	group = "application"
-	description = "Runs the Spring Boot application with the dev profile"
-	doFirst {
-		tasks.bootRun.configure {
-			systemProperty("spring.profiles.active", "dev")
-		}
-	}
-	finalizedBy("bootRun")
 }
 
 test {

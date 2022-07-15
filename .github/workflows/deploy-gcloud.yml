@@ -68,7 +68,6 @@ jobs:
           chmod u+x ./kustomize
 
       # Deploy the Docker image to the GKE cluster
-      #          ./kustomize edit set image LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG=$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA
       - name: Deploy
         run: |-
           cd $KUSTOMIZE_DIR
