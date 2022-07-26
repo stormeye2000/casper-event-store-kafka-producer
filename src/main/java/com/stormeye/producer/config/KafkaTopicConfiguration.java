@@ -14,38 +14,38 @@ public class KafkaTopicConfiguration {
 
     @Bean
     public NewTopic topicDeployProcessed() {
-        return TopicBuilder.name("DEPLOY_PROCESSED").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("DeployProcessed").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicDeployExpired() {
-        return TopicBuilder.name("DEPLOY_EXPIRED").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("DeployExpired").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicBlockAdded() {
-        return TopicBuilder.name("BLOCK_ADDED").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("BlockAdded").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicDeployAccepted() {
-        return TopicBuilder.name("DEPLOY_ACCEPTED").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("DeployAccepted").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicFinalitySignature() {
-        return TopicBuilder.name("FINALITY_SIGNATURE").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("FinalitySignature").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicStep() {
-        return TopicBuilder.name("STEP").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("Step").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicFault() {
-        return TopicBuilder.name("FAULT").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("Fault").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicApiVersion() {
-        return TopicBuilder.name("APIVERSION").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("ApiVersion").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
     @Bean
     public NewTopic topicShutdown() {
-        return TopicBuilder.name("SHUTDWON").partitions(PARTITIONS).replicas(REPLICAS).build();
+        return TopicBuilder.name("Shutdown").partitions(PARTITIONS).replicas(REPLICAS).build();
     }
 }
