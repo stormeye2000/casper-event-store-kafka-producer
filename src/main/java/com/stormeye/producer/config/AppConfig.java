@@ -1,6 +1,10 @@
 package com.stormeye.producer.config;
 
+import org.apache.kafka.clients.admin.Admin;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -14,8 +18,10 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import reactor.kafka.sender.SenderOptions;
 
 /**
@@ -63,7 +69,6 @@ public class AppConfig {
         Map<String, Object> props = new HashMap<>();
 
         final String bootstrapServers = properties.getBootstrapServers();
-//        final String bootstrapServers = "10.16.6.101:9093";
 
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
@@ -71,6 +76,26 @@ public class AppConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         log.info("Will connect to Kafka instance: [{}]", bootstrapServers);
+
+        try (Admin admin = Admin.create(props)) {
+
+            int partitions = 5;
+            short replicationFactor = 3;
+            NewTopic newTopic = new NewTopic("FinalitySignature", partitions, replicationFactor);
+
+            CreateTopicsResult result = admin.createTopics(
+                    Collections.singleton(newTopic)
+            );
+
+            KafkaFuture<Void> future = result.values().get("FinalitySignature");
+            future.get();
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         return props;
     }
