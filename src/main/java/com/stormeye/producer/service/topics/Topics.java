@@ -4,7 +4,7 @@ import org.apache.commons.text.CaseUtils;
 
 public enum Topics {
 
-    DEPLOY_PROCESSED, DEPLOY_EXPIRED, BLOCK_ADDED, DEPLOY_ACCEPTED, FINALITY_SIGNATURE, STEP, FAULT;
+    DEPLOY_PROCESSED, DEPLOY_EXPIRED, BLOCK_ADDED, DEPLOY_ACCEPTED, FINALITY_SIGNATURE, STEP, FAULT, API_VERSION, SHUTDOWN;
 
     public String toCamelCase(final Topics topic){
         return CaseUtils.toCamelCase(topic.toString(),true, '_');

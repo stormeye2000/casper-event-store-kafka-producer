@@ -62,8 +62,8 @@ public class AppConfig {
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
 
-//        final String bootstrapServers = properties.getBootstrapServers();
-        final String bootstrapServers = "10.16.6.101:9093";
+        final String bootstrapServers = properties.getBootstrapServers();
+//        final String bootstrapServers = "10.16.6.101:9093";
 
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
