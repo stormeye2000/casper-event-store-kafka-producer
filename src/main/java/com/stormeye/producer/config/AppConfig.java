@@ -17,6 +17,7 @@ import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+import com.stormeye.producer.service.topics.Topics;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,14 +82,18 @@ public class AppConfig {
 
             int partitions = 5;
             short replicationFactor = 3;
-            NewTopic newTopic = new NewTopic("FinalitySignature", partitions, replicationFactor);
 
-            CreateTopicsResult result = admin.createTopics(
-                    Collections.singleton(newTopic)
-            );
+            for (Topics topic : Topics.values()) {
+                final NewTopic newTopic = new NewTopic(topic.name(), partitions, replicationFactor);
 
-            KafkaFuture<Void> future = result.values().get("FinalitySignature");
-            future.get();
+                CreateTopicsResult result = admin.createTopics(
+                        Collections.singleton(newTopic)
+                );
+
+                final KafkaFuture<Void> future = result.values().get(topic.name());
+                future.get();
+            }
+
 
         } catch (ExecutionException e) {
             e.printStackTrace();
