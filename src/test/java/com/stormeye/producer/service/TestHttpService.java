@@ -2,6 +2,7 @@ package com.stormeye.producer.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.casper.sdk.model.event.EventType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,14 +15,13 @@ import org.springframework.retry.support.RetryTemplate;
 import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 import com.stormeye.producer.service.emitter.EmitterService;
-import com.stormeye.producer.service.topics.TopicsService;
 
 import java.io.IOException;
 import java.net.URI;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
-@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, AppConfig.class})
+@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, AppConfig.class})
 @EnableConfigurationProperties(value = {ServiceProperties.class})
 @EnableAutoConfiguration
 public class TestHttpService {
@@ -30,9 +30,6 @@ public class TestHttpService {
 
     @Autowired
     private EmitterService service;
-
-    @Autowired
-    private TopicsService topics;
 
     @Autowired
     private RetryTemplate retryTemplate;
@@ -61,8 +58,10 @@ public class TestHttpService {
     @Test
     void testInvalidConnection() {
 
-        Assertions.assertThrows(Exception.class, () -> retryTemplate.execute(ctx -> {
-            service.connect(URI.create("http://localhost:9999"));
+        assertThrows(Exception.class, () -> retryTemplate.execute(ctx -> {
+            URI uri = URI.create("http://localhost:9999");
+            service.connect(uri);
+            service.emitterStream(uri, EventType.MAIN);
             return null;
         }));
     }
@@ -93,8 +92,8 @@ public class TestHttpService {
                 .setBody("{\"id\": 1}")
                 .setResponseCode(200));
 
-        service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))).forEach(
-                event -> assertEquals("{\"id\": 1}", event)
+        service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort())), EventType.MAIN).forEach(
+                event -> assertEquals(1, event.getId())
         );
     }
 
@@ -106,8 +105,8 @@ public class TestHttpService {
                         .setBody(EVENT_STREAM)
                 .setResponseCode(200));
 
-        service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort()))).forEach(
-           event -> assertTrue(topics.hasTopic(event))
+        service.emitterStream(URI.create(String.format("http://localhost:%s", mockWebServer.getPort())), EventType.MAIN).forEach(
+           event -> assertNotNull(event.getEventType())
         );
     }
 

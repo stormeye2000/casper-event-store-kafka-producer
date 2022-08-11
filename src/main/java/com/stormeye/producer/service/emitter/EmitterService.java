@@ -1,5 +1,9 @@
 package com.stormeye.producer.service.emitter;
 
+import com.casper.sdk.model.event.Event;
+import com.casper.sdk.model.event.EventTarget;
+import com.casper.sdk.model.event.EventType;
+import com.casper.sdk.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,27 +26,16 @@ public class EmitterService {
 
     private final Logger log = LoggerFactory.getLogger(EmitterService.class.getName());
 
-    private HttpClient getClient(){
-        return HttpClient.newHttpClient();
-    }
-
-    private HttpRequest getRequest(final URI emitter) {
-        return HttpRequest.newBuilder(emitter).GET().build();
-    }
-
-    public Stream<String> emitterStream(final URI emitter) {
-        try {
-            return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
-        } catch (IOException | InterruptedException e) {
-           throw new EmitterStoppedException(e.getMessage());
-        }
-
+    public Stream<Event<String>> emitterStream(final URI emitter, final EventType eventType) {
+            final EventService eventService = EventService.usingPeer(emitter);
+            return eventService.readEventStream(eventType, EventTarget.RAW, 0L);
+            //return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
     }
 
     public void connect(final URI emitter) throws IOException, InterruptedException {
        log.info("Attempting to connect to [{}]", emitter);
-
-       this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).headers();
+        // TODO remove this
+       //this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).headers();
     }
 
 }

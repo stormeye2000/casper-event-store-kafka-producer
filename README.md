@@ -25,12 +25,10 @@ zookeeper-server-start ../../libexec/config/zookeeper.properties
 
 kakfka-server-start ../../libexec/config/serfer.properties
 
-kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic DeployProcessed
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic main
 
-kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic BlockAdded
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic deploys
 
-kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic DeployAccepted
-
-kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic FinalitySignature
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic sigs
 ```
 
