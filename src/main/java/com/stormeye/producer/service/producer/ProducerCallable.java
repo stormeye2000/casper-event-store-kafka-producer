@@ -10,16 +10,15 @@ import reactor.kafka.sender.SenderRecord;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static com.stormeye.producer.json.KafkaEventBuilder.buildKafkaEvent;
 
 /**
  * Callable producer class that enables concurrency on the http emitters
  * Also exposes exception handling to the calling method
  */
 public class ProducerCallable implements Callable<Object> {
-    private final Logger log = LoggerFactory.getLogger(ProducerCallable.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(ProducerCallable.class.getName());
     private static final Integer MAX_RANGE = 1;
 
     private final URI emitterUri;
@@ -43,28 +42,24 @@ public class ProducerCallable implements Callable<Object> {
 
                     event -> {
 
-                        final String topic = event.getEventType().name().toLowerCase();
+                        var topic = event.getEventType().name().toLowerCase();
 
-                        log.debug("Emitter: [{}] Topic: [{}] - Event : {}", emitterUri.toString(), topic, event);
+                        logger.debug("Emitter: [{}] Topic: [{}] - Event : {}", emitterUri, topic, event);
 
-                        final Flux<SenderRecord<Integer, String, Integer>> outboundFlux = Flux.range(0, MAX_RANGE)
+                        var outboundFlux = Flux.range(0, MAX_RANGE)
                                 .map(i ->
                                         SenderRecord.create(topic,
                                                 0,
                                                 System.currentTimeMillis(),
                                                 i,
-                                                buildKafkaEvent(event),
+                                                event,
                                                 i)
                                 );
 
-                        template.send(outboundFlux)
-                                .doOnError(e -> {
-                                    log.error("Send failed for event: {}", event);
-                                    log.error("Error - {}", e.getMessage());
-                                })
+                        //noinspection unchecked,rawtypes
+                        template.send((Flux) outboundFlux)
+                                .doOnError((Consumer<Throwable>) e -> logger.error("Send failed for event: " + event, e))
                                 .subscribe();
-
-
                     }
             );
 

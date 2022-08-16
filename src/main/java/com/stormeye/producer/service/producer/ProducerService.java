@@ -7,12 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
-import org.springframework.retry.RetryContext;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
@@ -25,60 +22,35 @@ import java.util.concurrent.Executors;
 public class ProducerService {
 
     private final Logger log = LoggerFactory.getLogger(ProducerService.class.getName());
-
     private final ServiceProperties properties;
     private final EmitterService emitterService;
-    private final RetryTemplate initialRetryTemplate;
     private final ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate;
 
     public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties,
                            final EmitterService emitterService,
-                           final RetryTemplate initialRetryTemplate,
                            final ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate) {
         this.properties = properties;
         this.emitterService = emitterService;
-        this.initialRetryTemplate = initialRetryTemplate;
         this.reactiveKafkaProducerTemplate = reactiveKafkaProducerTemplate;
     }
 
     public void startEventConsumers() {
 
         try {
-
-            final ExecutorService executor = Executors.newCachedThreadPool();
+            var executor = Executors.newCachedThreadPool();
 
             properties.getEmitters().forEach(
-                    emitter -> {
-
-                        Arrays.stream(EventType.values()).forEach(eventType -> {
-
-                            RetryContext context = null;
-                            try {
-                                context = initialRetryTemplate.execute(ctx -> {
-                                    emitterService.connect(emitter);
-                                    return ctx;
-                                });
-                            } catch (Exception e) {
-                                log.error("Failed to connect to emitter [{}] after retries, {}", emitter, e.getMessage());
-                            }
-
-                            if (context != null && !context.isExhaustedOnly()) {
-
-                                log.info("Successfully connected to emitter: [{}]", emitter);
-                                log.info("Starting kafka producer for casper event emitter: [{}]", emitter);
-
+                    emitter ->
+                            Arrays.stream(EventType.values()).forEach(eventType -> {
+                                log.info("Starting kafka producer for casper event [{}] emitter: [{}]", eventType, emitter);
                                 executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, emitter, emitterService.emitterStream(emitter, eventType)));
-
-                            }
-                        });
-                    }
+                            })
             );
         } catch (Exception e) {
             log.error(e.getMessage());
         }
 
     }
-
 
 
 }

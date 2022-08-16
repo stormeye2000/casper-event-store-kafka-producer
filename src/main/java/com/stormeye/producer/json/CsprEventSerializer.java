@@ -2,15 +2,30 @@ package com.stormeye.producer.json;
 
 
 import com.casper.sdk.model.event.Event;
+import org.apache.kafka.common.serialization.Serializer;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Converts an SDK Event to a JSON String representation of that event for sending to Kafka
  *
  * @author ian@meywood.com
  */
-public class KafkaEventBuilder {
+public class CsprEventSerializer implements Serializer<Event<String>> {
 
-    public static String buildKafkaEvent(final Event<String> rawEvent) {
+    /**
+     * Convert {@code data} into a byte array.
+     *
+     * @param topic topic associated with data
+     * @param data typed data
+     * @return serialized bytes
+     */
+    @Override
+    public byte[] serialize(final String topic, final Event<String> data) {
+        return buildKafkaEvent(data).getBytes(StandardCharsets.UTF_8);
+    }
+
+    private String buildKafkaEvent(final Event<String> rawEvent) {
 
         //noinspection StringBufferReplaceableByString
         return new StringBuilder("{\n  \"source\":\"")
@@ -33,14 +48,13 @@ public class KafkaEventBuilder {
      * @param data the data to correct
      * @return the corrected data with the data key quoted
      */
-    private static String correctJson(final String data) {
-        final int start = data.indexOf(':');
-        return "\"data\"" +  data.substring(start);
+    private String correctJson(final String data) {
+        return "\"data\"" + data.substring(data.indexOf(':'));
     }
 
-    private static String appendId(final Event<String> rawEvent) {
+    private String appendId(final Event<String> rawEvent) {
 
-        final StringBuilder builder = new StringBuilder("");
+        var builder = new StringBuilder();
 
         rawEvent.getId().ifPresent(id -> {
             builder.append("  \"id\":");
