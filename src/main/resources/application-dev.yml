@@ -1,5 +1,7 @@
 services:
-   topics:
+  emitters:
+    - ${CASPER_EVENTS_MAIN:http://65.21.235.219:9999}
+  topics:
     - topic: sigs
       partitions: 2
       replicas: 3

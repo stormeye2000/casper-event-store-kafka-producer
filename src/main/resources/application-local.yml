@@ -9,9 +9,8 @@ services:
     - topic: main
       partitions: 3
       replicas: 5
-services:
   emitters:
-    - http://65.21.235.219:9999/events/main
+    - ${CASPER_EVENTS_MAIN:http://65.21.235.219:9999}
 logging:
   level:
     com:
