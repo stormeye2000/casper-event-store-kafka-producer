@@ -1,15 +1,16 @@
 package com.stormeye.producer.service.emitter;
 
+import com.casper.sdk.model.event.Event;
+import com.casper.sdk.model.event.EventTarget;
+import com.casper.sdk.model.event.EventType;
+import com.casper.sdk.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import com.stormeye.producer.exceptions.EmitterStoppedException;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.stream.Stream;
 
 /**
@@ -20,29 +21,14 @@ import java.util.stream.Stream;
 @Service
 public class EmitterService {
 
-    private final Logger log = LoggerFactory.getLogger(EmitterService.class.getName());
+    private final Logger logger = LoggerFactory.getLogger(EmitterService.class.getName());
 
-    private HttpClient getClient(){
-        return HttpClient.newHttpClient();
-    }
+    @Retryable(maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 1000L, multiplier = 2, maxDelay = 60000L))
+    public Stream<Event<String>> emitterStream(final URI emitter, final EventType eventType) {
 
-    private HttpRequest getRequest(final URI emitter) {
-        return HttpRequest.newBuilder(emitter).GET().build();
-    }
-
-    public Stream<String> emitterStream(final URI emitter) {
-        try {
-            return this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).body();
-        } catch (IOException | InterruptedException e) {
-           throw new EmitterStoppedException(e.getMessage());
-        }
-
-    }
-
-    public void connect(final URI emitter) throws IOException, InterruptedException {
-       log.info("Attempting to connect to [{}]", emitter);
-
-       this.getClient().send(this.getRequest(emitter), HttpResponse.BodyHandlers.ofLines()).headers();
+        logger.debug("emitterStream for {} {}", emitter, eventType);
+        final EventService eventService = EventService.usingPeer(emitter);
+        return eventService.readEventStream(eventType, EventTarget.RAW, 0L);
     }
 
 }

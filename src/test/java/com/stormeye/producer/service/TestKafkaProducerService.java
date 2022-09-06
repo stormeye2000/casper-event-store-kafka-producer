@@ -3,6 +3,7 @@ package com.stormeye.producer.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.casper.sdk.model.event.EventType;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.ClassRule;
@@ -23,7 +24,6 @@ import com.stormeye.producer.exceptions.EmitterStoppedException;
 import com.stormeye.producer.service.emitter.EmitterService;
 import com.stormeye.producer.service.producer.ProducerCallable;
 import com.stormeye.producer.service.producer.ProducerService;
-import com.stormeye.producer.service.topics.TopicsService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,7 +38,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import reactor.kafka.sender.SenderOptions;
 
-@SpringBootTest(classes = {EmitterService.class, TopicsService.class, ServiceProperties.class, ProducerService.class, AppConfig.class})
+@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, ProducerService.class, AppConfig.class})
 @EnableConfigurationProperties(value = ServiceProperties.class)
 @EnableAutoConfiguration
 @EmbeddedKafka(topics = TestKafkaProducerService.REACTIVE_INT_KEY_TOPIC, partitions = 1)
@@ -50,10 +50,6 @@ public class TestKafkaProducerService {
 
     @Autowired
     private EmitterService emitterService;
-
-    @Autowired
-    private TopicsService topics;
-
 
     @ClassRule
     public static final EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true);
@@ -105,8 +101,8 @@ public class TestKafkaProducerService {
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final URI emitter = URI.create(String.format("http://localhost:%s", mockWebServer.getPort()));
 
-        final Future<Object> future = executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, topics, emitter,
-                emitterService.emitterStream(emitter)));
+        final Future<Object> future = executor.submit(new ProducerCallable(reactiveKafkaProducerTemplate, emitter,
+                emitterService.emitterStream(emitter, EventType.MAIN)));
 
         try {
             future.get();

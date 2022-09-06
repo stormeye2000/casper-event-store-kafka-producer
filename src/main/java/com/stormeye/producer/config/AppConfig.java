@@ -1,28 +1,22 @@
 package com.stormeye.producer.config;
 
-import org.apache.kafka.clients.admin.Admin;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
+import static java.util.Map.entry;
+
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.config.TopicConfig;
 import org.apache.kafka.common.serialization.IntegerSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
-import com.stormeye.producer.service.topics.Topics;
+import com.stormeye.producer.json.CsprEventSerializer;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import reactor.kafka.sender.SenderOptions;
 
 /**
@@ -33,82 +27,50 @@ import reactor.kafka.sender.SenderOptions;
 @Configuration
 public class AppConfig {
 
-    private final Logger log = LoggerFactory.getLogger(AppConfig.class.getName());
-    private final ServiceProperties properties;
-
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
+
+
+    @Qualifier("ServiceProperties") final ServiceProperties properties;
 
     public AppConfig(@Qualifier("ServiceProperties") final ServiceProperties properties) {
         this.properties = properties;
     }
 
-    @Bean
-    public RetryTemplate getInitialRetryTemplate() {
-
-        final RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.registerListener(new HttpEmitterConnectionRetry());
-
-        final ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
-        exponentialBackOffPolicy.setMaxInterval(50000L);
-        exponentialBackOffPolicy.setInitialInterval(5000L);
-        exponentialBackOffPolicy.setMultiplier(2);
-
-        retryTemplate.setBackOffPolicy(exponentialBackOffPolicy);
-
-        final SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(5);
-
-        retryTemplate.setRetryPolicy(retryPolicy);
-
-        return retryTemplate;
-    }
-
 
     @Bean
-    public Map<String, Object> producerConfigs() {
-        Map<String, Object> props = new HashMap<>();
-
-        final String bootstrapServers = properties.getBootstrapServers();
-
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-
-        log.info("Will connect to Kafka instance: [{}]", bootstrapServers);
-
-        try (Admin admin = Admin.create(props)) {
-
-            int partitions = 5;
-            short replicationFactor = 3;
-
-            for (Topics topic : Topics.values()) {
-                final NewTopic newTopic = new NewTopic(topic.name(), partitions, replicationFactor);
-
-                CreateTopicsResult result = admin.createTopics(
-                        Collections.singleton(newTopic)
-                );
-
-                final KafkaFuture<Void> future = result.values().get(topic.name());
-                future.get();
-            }
-
-
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        return props;
-    }
-
-    @Bean
-    public ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate(){
+    public ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate() {
         final SenderOptions<Integer, String> senderOptions = SenderOptions.<Integer, String>create(producerConfigs()).maxInFlight(1024);
         return new ReactiveKafkaProducerTemplate<>(senderOptions);
     }
 
+    @Bean
+    public List<NewTopic> newTopics() {
+
+        final List<NewTopic> newTopics = new ArrayList<>();
+
+        properties.getTopics().forEach( t ->
+            newTopics.add(
+                    TopicBuilder.name(t.getTopic())
+                            .partitions(t.getPartitions())
+                            .replicas(t.getReplicas())
+                            .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "uncompressed")
+                            .build()
+                )
+        );
+
+        return newTopics;
+    }
+
+    private Map<String, Object> producerConfigs() {
+
+        return Map.ofEntries(
+                entry(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers),
+                entry(ProducerConfig.CLIENT_ID_CONFIG, clientId),
+                entry(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class),
+                entry(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, CsprEventSerializer.class)
+        );
+    }
 }
