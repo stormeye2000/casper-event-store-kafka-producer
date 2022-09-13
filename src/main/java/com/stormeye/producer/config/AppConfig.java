@@ -56,7 +56,7 @@ public class AppConfig {
                     TopicBuilder.name(t.getTopic())
                             .partitions(t.getPartitions())
                             .replicas(t.getReplicas())
-                            .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "uncompressed")
+                            .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "gzip")
                             .build()
                 )
         );
