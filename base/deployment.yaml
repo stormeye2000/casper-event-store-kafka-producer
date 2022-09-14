@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: producer
-  name: producer
+    app: producer-audit
+  name: producer-audit
   namespace: kafka
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: producer
+      app: producer-audit
   template:
     metadata:
       labels:
-        app: producer
+        app: producer-audit
     spec:
       containers:
         - image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
-          imagePullPolicy: IfNotPresent
-          name: producer
+          imagePullPolicy: Always
+          name: producer-audit
           ports:
             - containerPort: 8080

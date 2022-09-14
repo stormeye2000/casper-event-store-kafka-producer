@@ -1,7 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+
 
 name: Build and Deploy to GKE
 
@@ -14,8 +11,8 @@ env:
   GAR_LOCATION: europe-west2-a
   GKE_CLUSTER: cspr-event-store-cluster
   GKE_ZONE: europe-west2-a
-  DEPLOYMENT_NAME: producer
-  IMAGE: casper-event-store-kafka-producer
+  DEPLOYMENT_NAME: producer-audit
+  IMAGE: producer-audit
   NAMESPACE: kafka
   KUSTOMIZE_DIR: base
 
