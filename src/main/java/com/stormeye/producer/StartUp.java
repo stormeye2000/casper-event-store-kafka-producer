@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import com.stormeye.producer.service.producer.ProducerService;
 
 /**
- * Starts the application via the ProducerService
+ * Starts the application via the ProducerService one all beans have been configured
  */
 @Component
 class StartUp implements ApplicationRunner {

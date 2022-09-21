@@ -17,6 +17,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "services")
 @EnableConfigurationProperties
 public class ServiceProperties {
+
+    /** URIs of the casper nodes to obtain event streams, provided as a comma separated string */
     private List<URI> emitters;
 
     public List<URI> getEmitters() {
@@ -26,5 +28,4 @@ public class ServiceProperties {
     public void setEmitters(final List<URI> emitters) {
         this.emitters = emitters;
     }
-
 }

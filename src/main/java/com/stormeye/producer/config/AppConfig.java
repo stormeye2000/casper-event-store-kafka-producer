@@ -26,7 +26,6 @@ public class AppConfig {
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
 
-
     @Bean
     public ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate() {
         final SenderOptions<Integer, String> senderOptions = SenderOptions.<Integer, String>create(producerConfigs()).maxInFlight(1024);
