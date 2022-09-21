@@ -1,3 +1,14 @@
+services:
+  topics:
+    - topic: sigs
+      partitions: 2
+      replicas: 3
+    - topic: deploys
+      partitions: 3
+      replicas: 5
+    - topic: main
+      partitions: 3
+      replicas: 5
 logging:
   level:
     com:

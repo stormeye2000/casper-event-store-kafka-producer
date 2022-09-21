@@ -24,4 +24,13 @@ public class TestServiceProperties {
         assertEquals(new URI("http://65.21.235.219:9999"), properties.getEmitters().get(0));
     }
 
+    @Test
+    void testTopics() {
+
+        assertEquals("sigs", properties.getTopics().get(0).getTopic());
+        assertEquals(5, properties.getTopics().get(1).getReplicas());
+        assertEquals(3, properties.getTopics().get(2).getPartitions());
+
+    }
+
 }
