@@ -1,7 +1,6 @@
 package com.stormeye.producer.config;
 
-import static java.util.Map.entry;
-
+import com.stormeye.producer.json.CsprEventSerializer;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.TopicConfig;
@@ -12,12 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
-import com.stormeye.producer.json.CsprEventSerializer;
+import reactor.kafka.sender.SenderOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import reactor.kafka.sender.SenderOptions;
+import java.util.stream.Collectors;
+
+import static java.util.Map.entry;
 
 /**
  * Configure any beans needed
@@ -31,7 +31,6 @@ public class AppConfig {
     private String bootstrapServers;
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
-
     final ServiceProperties properties;
 
     public AppConfig(@Qualifier("ServiceProperties") final ServiceProperties properties) {
@@ -40,26 +39,22 @@ public class AppConfig {
 
     @Bean
     public ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate() {
-        final SenderOptions<Integer, String> senderOptions = SenderOptions.<Integer, String>create(producerConfigs()).maxInFlight(1024);
-        return new ReactiveKafkaProducerTemplate<>(senderOptions);
+        return new ReactiveKafkaProducerTemplate<>(
+                SenderOptions.<Integer, String>create(producerConfigs()).maxInFlight(1024)
+        );
     }
 
     @Bean
     public List<NewTopic> newTopics() {
 
-        final List<NewTopic> newTopics = new ArrayList<>();
-
-        properties.getTopics().forEach( t ->
-            newTopics.add(
-                    TopicBuilder.name(t.getTopic())
-                            .partitions(t.getPartitions())
-                            .replicas(t.getReplicas())
-                            .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "uncompressed")
-                            .build()
-                )
-        );
-
-        return newTopics;
+        return properties.getTopics()
+                .stream()
+                .map(topic -> TopicBuilder.name(topic.getTopic())
+                        .partitions(topic.getPartitions())
+                        .replicas(topic.getReplicas())
+                        .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "uncompressed")
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private Map<String, Object> producerConfigs() {
