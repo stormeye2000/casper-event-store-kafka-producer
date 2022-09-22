@@ -37,34 +37,4 @@ public class ServiceProperties {
     public void setTopics(final List<Topic> topics) {
         this.topics = topics;
     }
-
-    public static class Topic {
-        private String topic;
-        private int partitions;
-        private int replicas;
-
-        public String getTopic() {
-            return topic;
-        }
-
-        public void setTopic(final String topic) {
-            this.topic = topic;
-        }
-
-        public int getPartitions() {
-            return partitions;
-        }
-
-        public void setPartitions(final int partitions) {
-            this.partitions = partitions;
-        }
-
-        public int getReplicas() {
-            return replicas;
-        }
-
-        public void setReplicas(final int replicas) {
-            this.replicas = replicas;
-        }
-    }
 }
