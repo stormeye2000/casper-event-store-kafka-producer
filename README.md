@@ -25,6 +25,8 @@ zookeeper-server-start ../../libexec/config/zookeeper.properties
 
 kakfka-server-start ../../libexec/config/server.properties
 
+#Create the topics, only needed on the initial run
+
 kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic main
 
 kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic deploys

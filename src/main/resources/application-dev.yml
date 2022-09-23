@@ -1,5 +1,7 @@
 services:
-   topics:
+  emitters:
+    - ${CASPER_EVENTS_MAIN:http://65.21.235.219:9999}
+  topics:
     - topic: sigs
       partitions: 2
       replicas: 3
@@ -17,6 +19,6 @@ logging:
     name: /var/log/cspr-producer.log
 spring:
   kafka:
-    bootstrap-servers: 172.31.8.239:9092
+    bootstrap-servers: ${KAFKA_SERVICE_SERVICE_HOST}:${KAFKA_SERVICE_SERVICE_PORT}
     producer:
       client-id: stormeye-kafka-dev
