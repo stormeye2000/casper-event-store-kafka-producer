@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.TestPropertySource;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,11 +68,11 @@ class IdStorageServiceTest {
     }
 
     @Test
-    void getCurrentIdAndGetNextId() {
+    void getCurrentIdAndGetNextId() throws URISyntaxException {
 
         mongoOperations.getCollection("eventIds").drop();
 
-        final String source = "http://localhost:9999";
+        final URI source = new URI("http://localhost:9999");
 
         assertThat(idStorageService.getCurrentId(source, EventType.MAIN), is(0L));
         assertThat(idStorageService.getNextId(source, EventType.MAIN), is(0L));

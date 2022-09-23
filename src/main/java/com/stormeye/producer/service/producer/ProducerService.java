@@ -82,7 +82,7 @@ public class ProducerService {
                 .subscribe();
 
         // Persist the ID of the event for playback
-        event.getId().ifPresent(id -> idStorageService.setCurrentEvent(emitter.toString(), event.getEventType(), id));
+        event.getId().ifPresent(id -> idStorageService.setCurrentEvent(emitter, event.getEventType(), id));
 
     }
 }

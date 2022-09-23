@@ -45,7 +45,7 @@ public class EmitterService {
                 eventType,
                 EventTarget.RAW,
                 // Start from the last event
-                idStorageService.getNextId(emitterUri.toString(), eventType),
+                idStorageService.getNextId(emitterUri, eventType),
                 consumer
         );
     }

@@ -138,8 +138,8 @@ public class ProducerServiceTest {
 
                 // Assert IDs are stored for each processed event with an ID
                 if (event.getId().isPresent()) {
-                    assertThat(idStorageService.getCurrentId(emitter.toString(), event.getEventType()), is(event.getId().get()));
-                    assertThat(idStorageService.getNextId(emitter.toString(), event.getEventType()), is(event.getId().get() + 1L));
+                    assertThat(idStorageService.getCurrentId(emitter, event.getEventType()), is(event.getId().get()));
+                    assertThat(idStorageService.getNextId(emitter, event.getEventType()), is(event.getId().get() + 1L));
                     ids[0]++;
                 }
             }
