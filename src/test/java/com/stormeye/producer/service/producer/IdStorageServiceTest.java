@@ -22,6 +22,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
+ * Unit tests for the {@link IdStorageService}.
+ *
  * @author ian@meywood.com
  */
 @SpringBootTest
