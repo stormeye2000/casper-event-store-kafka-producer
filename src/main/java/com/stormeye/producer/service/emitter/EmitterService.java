@@ -4,6 +4,7 @@ import com.casper.sdk.model.event.Event;
 import com.casper.sdk.model.event.EventTarget;
 import com.casper.sdk.model.event.EventType;
 import com.casper.sdk.service.EventService;
+import com.stormeye.producer.service.producer.IdStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
@@ -22,6 +23,12 @@ public class EmitterService {
 
     private final Logger logger = LoggerFactory.getLogger(EmitterService.class);
 
+    private final IdStorageService idStorageService;
+
+    public EmitterService(IdStorageService idStorageService) {
+        this.idStorageService = idStorageService;
+    }
+
     /**
      * Emits raw SSE events from a CSPR node to a kafka stream.
      *
@@ -34,7 +41,13 @@ public class EmitterService {
 
         logger.debug("emitterStream for {} {}", emitterUri, eventType);
 
-        EventService.usingPeer(emitterUri).consumeEvents(eventType, EventTarget.RAW, 0L, consumer);
+        EventService.usingPeer(emitterUri).consumeEvents(
+                eventType,
+                EventTarget.RAW,
+                // Start from the last event
+                idStorageService.getNextId(emitterUri.toString(), eventType),
+                consumer
+        );
     }
 
     @SuppressWarnings("unused")

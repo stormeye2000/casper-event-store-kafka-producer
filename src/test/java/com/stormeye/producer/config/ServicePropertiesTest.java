@@ -20,7 +20,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author ian@meywood.com
  */
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application.yml")
+@TestPropertySource(locations = {"classpath:application.yml", "classpath:application-test.properties"})
 class ServicePropertiesTest {
 
     @Autowired

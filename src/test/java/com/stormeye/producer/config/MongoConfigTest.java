@@ -17,7 +17,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
  * @author ian@meywood.com
  */
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application.yml")
+@TestPropertySource(locations = "classpath:application-test.properties")
 class MongoConfigTest {
 
     @Autowired
@@ -29,12 +29,12 @@ class MongoConfigTest {
     void mongoClientInjects() {
         assertThat(mongoOperations, is(notNullValue()));
         assertThat(mongoOperations, instanceOf(MongoTemplate.class));
-        assertThat(((MongoTemplate) mongoOperations).getDb().getName(), is("casper-producer"));
+        assertThat(((MongoTemplate) mongoOperations).getDb().getName(), is("test-casper-producer"));
     }
 
     @Test
     void getDatabaseName() {
-        assertThat(mongoConfig.getDatabaseName(), is("casper-producer"));
+        assertThat(mongoConfig.getDatabaseName(), is("test-casper-producer"));
     }
 
     @Test

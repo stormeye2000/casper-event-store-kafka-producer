@@ -2,8 +2,6 @@ package com.stormeye.producer.service.emitter;
 
 import com.casper.sdk.model.event.DataType;
 import com.casper.sdk.model.event.EventType;
-import com.stormeye.producer.config.AppConfig;
-import com.stormeye.producer.config.ServiceProperties;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -13,9 +11,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,9 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 
-@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, AppConfig.class})
-@EnableConfigurationProperties(value = {ServiceProperties.class})
-@EnableAutoConfiguration
+@SpringBootTest
+@TestPropertySource(locations = {"classpath:application.yml", "classpath:application-test.properties"})
 public class EmitterServiceTest {
 
     public MockWebServer mockWebServer = new MockWebServer();

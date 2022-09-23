@@ -30,13 +30,16 @@ public class ProducerService {
     private final Logger logger = LoggerFactory.getLogger(ProducerService.class.getName());
     private final ServiceProperties properties;
     private final EmitterService emitterService;
+    private final IdStorageService idStorageService;
     private final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate;
 
     public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties,
                            final EmitterService emitterService,
+                           final IdStorageService idStorageService,
                            final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate) {
         this.properties = properties;
         this.emitterService = emitterService;
+        this.idStorageService = idStorageService;
         this.producerTemplate = producerTemplate;
     }
 
@@ -77,5 +80,9 @@ public class ProducerService {
         producerTemplate.send((Flux) outboundFlux)
                 .doOnError((Consumer<Throwable>) e -> logger.error("Send failed for event: " + event, e))
                 .subscribe();
+
+        // Persist the ID of the event for playback
+        event.getId().ifPresent(id -> idStorageService.setCurrentEvent(emitter.toString(), event.getEventType(), id));
+
     }
 }
