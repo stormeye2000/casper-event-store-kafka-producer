@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-
 /**
  * Service to start the kafka producer
  * Each emitter will be tested connected via the retry template

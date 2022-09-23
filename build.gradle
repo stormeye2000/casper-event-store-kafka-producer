@@ -22,6 +22,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}"
 	implementation "org.springframework.retry:spring-retry:${springRetryVerion}"
 	implementation "org.springframework.kafka:spring-kafka:${springKafkaVersion}"
 	implementation "org.apache.kafka:kafka-streams:${kafkaVersion}"
