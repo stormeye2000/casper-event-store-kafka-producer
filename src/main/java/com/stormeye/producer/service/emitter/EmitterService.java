@@ -22,10 +22,9 @@ import java.util.function.Consumer;
 public class EmitterService {
 
     private final Logger logger = LoggerFactory.getLogger(EmitterService.class);
-
     private final IdStorageService idStorageService;
 
-    public EmitterService(IdStorageService idStorageService) {
+    public EmitterService(final IdStorageService idStorageService) {
         this.idStorageService = idStorageService;
     }
 
