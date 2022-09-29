@@ -1,9 +1,11 @@
 package com.stormeye.producer.config;
 
-import com.stormeye.producer.json.CsprEventSerializer;
+import static java.util.Map.entry;
+
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.config.TopicConfig;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,13 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
-import reactor.kafka.sender.SenderOptions;
+import com.stormeye.producer.json.CsprEventSerializer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.Map.entry;
+import reactor.kafka.sender.SenderOptions;
 
 /**
  * Configure any beans needed
@@ -45,6 +46,11 @@ public class AppConfig {
     }
 
     @Bean
+    public AdminClient adminClient(){
+        return KafkaAdminClient.create(producerConfigs());
+    }
+
+    @Bean
     public List<NewTopic> newTopics() {
 
         return properties.getTopics()
@@ -52,7 +58,6 @@ public class AppConfig {
                 .map(topic -> TopicBuilder.name(topic.getTopic())
                         .partitions(topic.getPartitions())
                         .replicas(topic.getReplicas())
-                        .config(TopicConfig.COMPRESSION_TYPE_CONFIG, "uncompressed")
                         .build())
                 .collect(Collectors.toList());
     }
