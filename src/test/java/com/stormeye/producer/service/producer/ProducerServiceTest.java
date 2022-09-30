@@ -1,13 +1,12 @@
 package com.stormeye.producer.service.producer;
 
-import com.casper.sdk.model.event.Event;
-import com.stormeye.producer.config.AppConfig;
-import com.stormeye.producer.config.ServiceProperties;
-import com.stormeye.producer.service.emitter.EmitterService;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+import static org.hamcrest.core.IsNull.notNullValue;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,23 +16,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
+import com.casper.sdk.model.event.Event;
+import com.stormeye.producer.config.AppConfig;
+import com.stormeye.producer.config.BrokerState;
+import com.stormeye.producer.config.ServiceProperties;
+import com.stormeye.producer.service.emitter.EmitterService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsIterableContaining.hasItem;
-import static org.hamcrest.core.IsNull.notNullValue;
-
-@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, ProducerService.class, AppConfig.class})
+@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, ProducerService.class, AppConfig.class, BrokerState.class})
 @EnableConfigurationProperties(value = ServiceProperties.class)
 @EnableAutoConfiguration
 @EmbeddedKafka(topics = {"main", "deploys", "sigs"}, partitions = 1)
@@ -47,7 +48,7 @@ public class ProducerServiceTest {
     @ClassRule
     public static final EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true);
     @Autowired
-    private ReactiveKafkaProducerTemplate<Integer, String> reactiveKafkaProducerTemplate;
+    private KafkaProducer<Integer, Event<?>> kafkaProducer;
 
     @BeforeEach
     void init() throws IOException {
@@ -58,7 +59,7 @@ public class ProducerServiceTest {
     @Test
     void producerCreated() {
         assertThat(producerService, is(notNullValue()));
-        assertThat(reactiveKafkaProducerTemplate, is(notNullValue()));
+        assertThat(kafkaProducer, is(notNullValue()));
     }
 
     @Test
@@ -98,7 +99,6 @@ public class ProducerServiceTest {
             }
         });
 
-
         //  final ExecutorService executor = Executors.newFixedThreadPool(1);
         final URI emitter = URI.create(String.format("http://localhost:%s", mockWebServer.getPort()));
 
@@ -112,7 +112,7 @@ public class ProducerServiceTest {
         final int[] deploys = {0};
         final int[] sigs = {0};
 
-        final ProducerService localProducerService = new ProducerService(serviceProperties, emitterService, reactiveKafkaProducerTemplate) {
+        final ProducerService localProducerService = new ProducerService(serviceProperties, emitterService, kafkaProducer) {
             @Override
             void sendEvent(URI emitter, Event<?> event) {
 

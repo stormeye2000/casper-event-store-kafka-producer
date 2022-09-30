@@ -1,5 +1,11 @@
 package com.stormeye.producer.config;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
+import static org.hamcrest.core.IsNull.notNullValue;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -7,12 +13,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsIterableContaining.hasItems;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 /**
  * Unit test for the {@link ServiceProperties} class.
@@ -42,9 +42,9 @@ class ServicePropertiesTest {
         assertThat(topics, is(notNullValue()));
         assertThat(topics, hasSize(3));
         assertThat(topics, hasItems(
-                new Topic("deploys", 3, 5),
-                new Topic("main", 3, 5),
-                new Topic("sigs", 2, 3)
+                new Topic("deploys", 3, 5, "snappy"),
+                new Topic("main", 3, 5,"snappy"),
+                new Topic("sigs", 2, 3,"uncompressed")
         ));
     }
 }

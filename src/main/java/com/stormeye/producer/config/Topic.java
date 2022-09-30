@@ -9,11 +9,13 @@ public class Topic {
     private String topic;
     private int partitions;
     private int replicas;
+    private String compression;
 
-    public Topic(final String topic, final int partitions, final int replicas) {
+    public Topic(final String topic, final int partitions, final int replicas, final String compression) {
         this.topic = Objects.requireNonNull(topic, "topic must not be null");
         this.partitions = partitions;
         this.replicas = replicas;
+        this.compression = compression;
     }
 
     @SuppressWarnings("unused")
@@ -46,6 +48,14 @@ public class Topic {
 
     public int getReplicas() {
         return replicas;
+    }
+
+    public String getCompression() {
+        return compression;
+    }
+
+    public void setCompression(final String compression) {
+        this.compression = compression;
     }
 
     @Override
