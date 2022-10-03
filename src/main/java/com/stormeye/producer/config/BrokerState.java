@@ -26,8 +26,7 @@ public class BrokerState {
     public boolean isAvailable() {
         try {
             final ListTopicsResult topics = adminClient.listTopics();
-            topics.names().get();
-            return true;
+            return !topics.names().get().isEmpty();
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
             logger.error(e.getMessage());
             return false;
