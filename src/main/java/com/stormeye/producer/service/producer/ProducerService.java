@@ -1,22 +1,20 @@
 package com.stormeye.producer.service.producer;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import com.casper.sdk.model.event.Event;
 import com.casper.sdk.model.event.EventType;
 import com.stormeye.producer.config.ServiceProperties;
 import com.stormeye.producer.exceptions.EmitterStoppedException;
 import com.stormeye.producer.service.emitter.EmitterService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.kafka.sender.SenderRecord;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 /**
  * Service to start the kafka producer
@@ -26,21 +24,19 @@ import java.util.function.Consumer;
 @Service
 public class ProducerService {
 
-    private static final Integer MAX_RANGE = 1;
     private final Logger logger = LoggerFactory.getLogger(ProducerService.class.getName());
+
     private final ServiceProperties properties;
     private final EmitterService emitterService;
+    private final KafkaProducer<Integer, Event<?>> kafkaProducer;
     private final IdStorageService idStorageService;
-    private final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate;
 
     public ProducerService(@Qualifier("ServiceProperties") final ServiceProperties properties,
-                           final EmitterService emitterService,
-                           final IdStorageService idStorageService,
-                           final ReactiveKafkaProducerTemplate<Integer, String> producerTemplate) {
+                           final EmitterService emitterService, final IdStorageService idStorageService, final KafkaProducer<Integer, Event<?>> kafkaProducer) {
         this.properties = properties;
         this.emitterService = emitterService;
         this.idStorageService = idStorageService;
-        this.producerTemplate = producerTemplate;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public void startEventConsumers() {
@@ -73,16 +69,12 @@ public class ProducerService {
 
         logger.debug("Emitter: [{}] Topic: [{}] - Event : [{}]", emitter, topic, event);
 
-        var outboundFlux = Flux.range(0, MAX_RANGE)
-                .map(i -> SenderRecord.create(topic, 0, System.currentTimeMillis(), i, event, i));
-
-        //noinspection unchecked,rawtypes
-        producerTemplate.send((Flux) outboundFlux)
-                .doOnError((Consumer<Throwable>) e -> logger.error("Send failed for event: " + event, e))
-                .subscribe();
+        kafkaProducer.send(new ProducerRecord<>(topic, 0, System.currentTimeMillis(), null, event), new SendCallback());
 
         // Persist the ID of the event for playback
         event.getId().ifPresent(id -> idStorageService.setCurrentEvent(emitter, event.getEventType(), id));
 
     }
+
+
 }
