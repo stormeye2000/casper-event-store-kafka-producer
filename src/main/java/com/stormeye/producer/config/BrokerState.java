@@ -1,13 +1,11 @@
 package com.stormeye.producer.config;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.ListTopicsResult;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.errors.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutionException;
+import com.casper.sdk.model.event.Event;
 
 /**
  * Performs a simple query on the kafka broker
@@ -17,17 +15,16 @@ import java.util.concurrent.ExecutionException;
 public class BrokerState {
 
     private final Logger logger = LoggerFactory.getLogger(BrokerState.class.getName());
-    private final AdminClient adminClient;
+    private final KafkaProducer<Integer, Event<?>> kafkaProducer;
 
-    public BrokerState(final AdminClient adminClient) {
-        this.adminClient = adminClient;
+    public BrokerState(final KafkaProducer<Integer, Event<?>> kafkaProducer) {
+        this.kafkaProducer = kafkaProducer;
     }
 
     public boolean isAvailable() {
         try {
-            final ListTopicsResult topics = adminClient.listTopics();
-            return !topics.names().get().isEmpty();
-        } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            return !kafkaProducer.metrics().isEmpty();
+        } catch (TimeoutException e) {
             logger.error(e.getMessage());
             return false;
         }

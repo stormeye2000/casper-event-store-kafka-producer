@@ -25,3 +25,10 @@ spring:
     bootstrap-servers: ${KAFKA_SERVICE_SERVICE_HOST}:${KAFKA_SERVICE_SERVICE_PORT}
     producer:
       client-id: stormeye-kafka-dev
+  application:
+    name: Casper Event Store Kafka Producer
+
+  data:
+    mongodb:
+      host: mongo-events-0.mongo-events-service:27017/casper-producer,mongo-events-1.mongo-events-service:27017/casper-producer
+

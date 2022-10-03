@@ -7,21 +7,21 @@ import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ResourceUtils;
 import com.casper.sdk.model.event.Event;
 import com.casper.sdk.model.event.EventTarget;
 import com.casper.sdk.model.event.EventType;
-import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.BrokerState;
-import com.stormeye.producer.config.ServiceProperties;
-import com.stormeye.producer.service.emitter.EmitterService;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +32,8 @@ import java.nio.file.Files;
 import java.util.Properties;
 import okhttp3.mockwebserver.MockWebServer;
 
-@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, ProducerService.class, AppConfig.class, BrokerState.class})
-@TestPropertySource(locations = "classpath:application.yml")
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 @EnableAutoConfiguration
 @Disabled
 public class TestLargeEvent {
@@ -43,6 +43,13 @@ public class TestLargeEvent {
     private ProducerService producerService;
     @Autowired
     private BrokerState brokerState;
+    @Autowired
+    private MongoOperations mongoOperations;
+
+    @AfterEach
+    void teardown() {
+        ((MongoTemplate) mongoOperations).getDb().drop();
+    }
 
     @BeforeEach
     void init() throws IOException {

@@ -2,8 +2,6 @@ package com.stormeye.producer.config;
 
 import static java.util.Map.entry;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -43,11 +41,6 @@ public class AppConfig {
     @Bean
     public KafkaProducer<Integer, Event<?>> kafkaProducer(){
         return new KafkaProducer<>(producerConfigs());
-    }
-
-    @Bean
-    public AdminClient adminClient(){
-        return KafkaAdminClient.create(producerConfigs());
     }
 
     @Bean

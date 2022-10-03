@@ -7,8 +7,12 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest(classes = {BrokerState.class, AppConfig.class, ServiceProperties.class})
+@SpringBootTest
+@TestPropertySource(locations = {"classpath:application.yml", "classpath:application-test.properties"})
+@EmbeddedKafka(topics = {"main", "deploys", "sigs"}, partitions = 1, ports = {9092})
 public class TestBrokerState {
 
     @Autowired
@@ -19,7 +23,7 @@ public class TestBrokerState {
 
         assertThat(brokerState, is(notNullValue()));
 
-        assertThat(brokerState.isAvailable(), is(false));
+        assertThat(brokerState.isAvailable(), is(true));
 
     }
 
