@@ -1,7 +1,6 @@
 package com.stormeye.producer.service.producer;
 
 import com.casper.sdk.model.event.Event;
-import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 import com.stormeye.producer.service.emitter.EmitterService;
 import okhttp3.mockwebserver.Dispatcher;
@@ -14,12 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
+import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +31,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.hamcrest.core.IsNull.notNullValue;
 
-@SpringBootTest(classes = {EmitterService.class, ServiceProperties.class, ProducerService.class, AppConfig.class})
-@EnableConfigurationProperties(value = ServiceProperties.class)
-@EnableAutoConfiguration
+@SpringBootTest
+@TestPropertySource(locations = {"classpath:application.yml", "classpath:application-test.properties"})
 @EmbeddedKafka(topics = {"main", "deploys", "sigs"}, partitions = 1)
 public class ProducerServiceTest {
 
@@ -44,6 +41,8 @@ public class ProducerServiceTest {
     private ProducerService producerService;
     @Autowired
     private EmitterService emitterService;
+    @Autowired
+    private IdStorageService idStorageService;
     @ClassRule
     public static final EmbeddedKafkaRule embeddedKafka = new EmbeddedKafkaRule(1, true);
     @Autowired
@@ -98,7 +97,6 @@ public class ProducerServiceTest {
             }
         });
 
-
         //  final ExecutorService executor = Executors.newFixedThreadPool(1);
         final URI emitter = URI.create(String.format("http://localhost:%s", mockWebServer.getPort()));
 
@@ -111,10 +109,18 @@ public class ProducerServiceTest {
         final int[] main = {0};
         final int[] deploys = {0};
         final int[] sigs = {0};
+        final int[] ids = {0};
 
-        final ProducerService localProducerService = new ProducerService(serviceProperties, emitterService, reactiveKafkaProducerTemplate) {
+        final ProducerService localProducerService = new ProducerService(
+                serviceProperties,
+                emitterService,
+                idStorageService,
+                reactiveKafkaProducerTemplate
+        ) {
             @Override
             void sendEvent(URI emitter, Event<?> event) {
+
+                super.sendEvent(emitter, event);
 
                 switch (event.getEventType()) {
                     case MAIN:
@@ -130,7 +136,12 @@ public class ProducerServiceTest {
                 }
                 count[0]++;
 
-                // super.sendEvent(emitter, event);
+                // Assert IDs are stored for each processed event with an ID
+                if (event.getId().isPresent()) {
+                    assertThat(idStorageService.getCurrentId(emitter, event.getEventType()), is(event.getId().get()));
+                    assertThat(idStorageService.getNextId(emitter, event.getEventType()), is(event.getId().get() + 1L));
+                    ids[0]++;
+                }
             }
         };
 
@@ -144,8 +155,7 @@ public class ProducerServiceTest {
         assertThat(main[0], is(greaterThan(0)));
         assertThat(deploys[0], is(greaterThan(0)));
         assertThat(sigs[0], is(greaterThan(0)));
-
-
+        assertThat(ids[0], is(greaterThan(0)));
     }
 
 

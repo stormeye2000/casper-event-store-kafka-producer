@@ -30,3 +30,7 @@ spring:
       client-id: ${KAFKA_CLIENT_ID:stormeye-kafka}
   application:
     name: Casper Event Store Kafka Producer
+
+  data:
+    mongodb:
+      host: 10.154.15.231:27017/casper-producer
