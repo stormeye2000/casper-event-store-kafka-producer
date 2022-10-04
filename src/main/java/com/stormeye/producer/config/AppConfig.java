@@ -32,7 +32,7 @@ public class AppConfig {
     @Value("${spring.kafka.producer.client-id}")
     private String clientId;
     private final ServiceProperties properties;
-    private final static int PRODUCER_BYTES = 33554432;
+    private final static int PRODUCER_BYTES = 268435456;
 
     public AppConfig(@Qualifier("ServiceProperties") final ServiceProperties properties) {
         this.properties = properties;

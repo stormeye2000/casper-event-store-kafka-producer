@@ -16,6 +16,7 @@ public class SendCallback implements Callback {
     public void onCompletion(final RecordMetadata recordMetadata, Exception e) {
         if (e != null) {
             logger.error("Error producing event to topic: {}", recordMetadata);
+            logger.error(e.getMessage());
         } else {
             logger.debug("Succesfully sent event to Topic: [{}]  Partition: [{}]  Offset: [{}]", recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
         }
