@@ -15,6 +15,7 @@ import com.stormeye.producer.config.AppConfig;
 import com.stormeye.producer.config.ServiceProperties;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(classes = {AppConfig.class, ServiceProperties.class})
 @EmbeddedKafka(topics = {"main"}, partitions = 1, ports = {9094}, brokerProperties = {"message.max.bytes=268435456"})
@@ -22,6 +23,14 @@ public class SendMegaEventSuccess extends SendMethods {
     @Autowired
     private KafkaProducer<Integer, Event<?>> kafkaProducer;
 
+    /**
+     * Sends a large event with the broker message.max.bytes set to 256mb and the producer's
+     * max.request.size and buffer.memory set to 256mb.
+     * These config changes allow large messages to be sent
+     * A pass is the meta data containing the topic
+     * A fail is an exception
+     * @throws Exception
+     */
     @Test
     void testSendEvent() throws Exception {
 
@@ -32,17 +41,9 @@ public class SendMegaEventSuccess extends SendMethods {
 
         final Future<RecordMetadata> send = kafkaProducer.send(producerRecord, null);
 
-        while (!send.isDone()){
-            Thread.sleep(1000);
-        }
+        final RecordMetadata meta = send.get(5, TimeUnit.SECONDS);
 
-        try {
-            send.get();
-            assertThat(Boolean.TRUE, is(Boolean.TRUE));
-        } catch (Exception e){
-            assertThat(Boolean.TRUE, is(Boolean.FALSE));
-        }
-
+        assertThat(meta.topic(), is(TOPIC));
 
     }
 
