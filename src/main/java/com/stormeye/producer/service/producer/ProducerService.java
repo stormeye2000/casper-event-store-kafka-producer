@@ -69,7 +69,13 @@ public class ProducerService {
 
         logger.debug("Emitter: [{}] Topic: [{}] - Event : [{}]", emitter, topic, event);
 
-        kafkaProducer.send(new ProducerRecord<>(topic, 0, System.currentTimeMillis(), null, event), new SendCallback());
+        kafkaProducer.send(new ProducerRecord<>(topic, 0, System.currentTimeMillis(), null, event), (metadata, exception) -> {
+            if (exception != null) {
+                logger.error("Error producing event - Metadata: [{}]", metadata, exception);
+            } else {
+                logger.debug("Succesfully sent event to Topic: [{}]  Partition: [{}]  Offset: [{}]", metadata.topic(), metadata.partition(), metadata.offset());
+            }
+        });
 
         // Persist the ID of the event for playback
         event.getId().ifPresent(id -> idStorageService.setCurrentEvent(emitter, event.getEventType(), id));
