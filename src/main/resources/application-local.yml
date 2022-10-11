@@ -25,3 +25,6 @@ spring:
     bootstrap-servers: localhost:9092
     producer:
       client-id: stormeye-kafka-local
+  data:
+    mongodb:
+      host: localhost:27017/casper-producer
