@@ -20,6 +20,8 @@ import java.nio.charset.StandardCharsets;
  */
 class CsprEventSerializerTest {
 
+    private static final String API_TXT = "data:{\"ApiVersion\":\"1.0.0\"}";
+
     private static final String DATA_TXT = "data:{\"BlockAdded\":{\"block_hash\":" +
             "\"bb878bcf8827649f070c487800a95c35be3eb2e83b5447921675040cea38af1c\",\"block\":{\"hash\":" +
             "\"bb878bcf8827649f070c487800a95c35be3eb2e83b5447921675040cea38af1c\",\"header\":{\"parent_hash\":" +
@@ -53,6 +55,7 @@ class CsprEventSerializerTest {
         assertThat(kafkaEvent, hasJsonPath("$.source", is(source.toString())));
         assertThat(kafkaEvent, hasJsonPath("$.type", is("main")));
         assertThat(kafkaEvent, hasJsonPath("$.dataType", is("BlockAdded")));
+        assertThat(kafkaEvent, hasJsonPath("$.version", is("1.0.0")));
         assertThat(kafkaEvent, hasJsonPath("$.data"));
         assertThat(kafkaEvent, hasJsonPath("$.data.BlockAdded"));
         assertThat(kafkaEvent, hasJsonPath("$.data.BlockAdded.block_hash", is("bb878bcf8827649f070c487800a95c35be3eb2e83b5447921675040cea38af1c")));
@@ -74,6 +77,7 @@ class CsprEventSerializerTest {
         Method processLine = eventBuildClass.getDeclaredMethod("processLine", String.class);
         processLine.setAccessible(true);
 
+        processLine.invoke(eventBuilder, API_TXT);
         processLine.invoke(eventBuilder, DATA_TXT);
         processLine.invoke(eventBuilder, ID_TXT);
 

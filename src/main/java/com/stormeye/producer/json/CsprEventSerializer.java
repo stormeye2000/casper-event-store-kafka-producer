@@ -1,8 +1,7 @@
 package com.stormeye.producer.json;
 
-
-import com.casper.sdk.model.event.Event;
 import org.apache.kafka.common.serialization.Serializer;
+import com.casper.sdk.model.event.Event;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,6 +11,8 @@ import java.nio.charset.StandardCharsets;
  * @author ian@meywood.com
  */
 public class CsprEventSerializer implements Serializer<Event<String>> {
+
+    private static String apiVersion = null;
 
     /**
      * Convert {@code data} into a byte array.
@@ -35,6 +36,9 @@ public class CsprEventSerializer implements Serializer<Event<String>> {
                 .append("\",\n")
                 .append("  \"dataType\":\"")
                 .append(rawEvent.getDataType().getDataTypeName())
+                .append("\",\n")
+                .append("  \"version\":\"")
+                .append(rawEvent.getVersion())
                 .append("\",\n")
                 .append(appendId(rawEvent))
                 .append(correctJson(rawEvent.getData()))

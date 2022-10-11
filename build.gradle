@@ -38,7 +38,7 @@ dependencies {
 	implementation "com.squareup.okhttp3:okhttp:${okhttpVersion}"
 	implementation "org.apache.httpcomponents:httpclient:${httpclientversion}"
 	implementation "org.apache.logging.log4j:log4j-core"
-	implementation files('libs/casper-java-sdk-0.5.2-SNAPSHOT.jar')
+	implementation files('libs/casper-java-sdk-0.5.3-SNAPSHOT.jar')
 
 	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
